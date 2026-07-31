@@ -10,7 +10,7 @@ redirect_from:
 {% include base_path %}
 
 <div class="home-hero" markdown="0">
-  <div class="home-hero__categories">ROBOT ENGINEERING · PROGRAMMING · WRITING</div>
+  <div class="home-hero__categories">ROBOT · LIFE · WRITING</div>
   <h1 class="home-hero__title">Hi, I am Haoran Liu.</h1>
   <p class="home-hero__description">
     I study Robot Engineering at Northeast Electric Power University (NEEPU), 

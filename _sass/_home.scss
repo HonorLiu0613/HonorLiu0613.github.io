@@ -9,12 +9,12 @@ body {
   background-attachment: fixed;
 }
 
-/* Hero card wrapper */
+/* Hero card wrapper — big white rounded card */
 .home-hero {
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-  padding: 2.8rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.8rem;
   margin-bottom: 2rem;
 }
 
