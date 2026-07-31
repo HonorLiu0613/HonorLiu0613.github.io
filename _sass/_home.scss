@@ -79,8 +79,18 @@ body {
   color: #ffffff !important;
 }
 
-/* Archive item excerpt — smaller, light gray, always visible in grid */
-.grid__item .archive__item-excerpt {
+/* Date and excerpt on listing cards — small + light gray */
+.archive__item .page__date,
+.archive__item .page__date strong {
+  font-size: 0.6rem;
+  color: #bbb;
+  font-weight: 400;
+}
+
+/* Grid view excerpt (Works / Experience) */
+.grid__item .archive__item-excerpt,
+.grid__item .archive__item-excerpt p,
+.grid__item .archive__item > p {
   display: block !important;
   font-size: 0.6rem !important;
   color: #bbb !important;
@@ -88,18 +98,11 @@ body {
   margin-top: 0.25em;
 }
 
-/* Date and excerpt on listing cards — small + light gray */
-.archive__item .page__date {
-  font-size: 0.6rem;
-  color: #bbb;
-}
-.archive__item .page__date strong {
-  font-weight: 400;
-  color: #bbb;
-}
-
-/* Also style excerpt in list view */
-.archive__item-excerpt {
+/* List view excerpt (Posts) */
+.list__item .archive__item-excerpt,
+.list__item .archive__item-excerpt p,
+.archive__item-excerpt,
+.archive__item-excerpt p {
   font-size: 0.65rem;
   color: #bbb;
 }
@@ -123,13 +126,14 @@ body {
 
 /* Sidebar: bio, location, and social links — larger + light gray */
 .sidebar .author__bio {
-  font-size: 0.85rem;
-  color: #999;
+  font-size: 0.85rem !important;
+  color: #999 !important;
 }
 
-.sidebar p {
-  font-size: 0.8rem;
-  color: #999;
+.sidebar p,
+.sidebar li {
+  font-size: 0.8rem !important;
+  color: #999 !important;
 }
 
 .author__urls a {
