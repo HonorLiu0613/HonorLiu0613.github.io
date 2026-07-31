@@ -7,17 +7,43 @@ redirect_from:
   - /about.html
 ---
 
-Hi! I'm **Haoran Liu** (刘浩然), a student at Northeast Electric Power University (NEEPU), majoring in **Robot Engineering**.
+{% include base_path %}
 
-I'm passionate about robotics, programming, and building things. This website is where I share my projects, experiences, and random thoughts.
+<div class="home-hero" markdown="0">
+  <div class="home-hero__categories">ROBOT ENGINEERING · PROGRAMMING · WRITING</div>
+  <h1 class="home-hero__title">Hi, I am Haoran Liu.</h1>
+  <p class="home-hero__description">
+    I study Robot Engineering at Northeast Electric Power University (NEEPU), 
+    think about robots and automation, and keep notes on technology, books, 
+    travel, and daily life.
+  </p>
+  <div class="home-hero__buttons">
+    <a href="{{ base_path }}/" class="btn btn--deep-blue">About me</a>
+    <a href="{{ base_path }}/cv/" class="btn btn--deep-blue">Curriculum Vitae (PDF)</a>
+    <a href="{{ base_path }}/posts/" class="btn btn--deep-blue-outline">Browse posts</a>
+  </div>
+</div>
 
-## What I Do
+<div class="home-section__label">RESEARCH & PROJECTS</div>
+<div class="home-section__title">What I'm working on</div>
 
-- 🤖 **Robot Engineering** — Learning about robot design, control systems, and automation
-- 💻 **Programming** — Writing code and building projects
-- 📝 **Blogging** — Sharing my learning journey and daily life
+- **Robot Engineering** — Studying robot design, control systems, and autonomous navigation at NEEPU
+- **Embedded Systems** — Building projects with Arduino, STM32, and ESP32
+- **Programming** — Writing code in Python, C/C++, and MATLAB for robotics applications
 
-## About This Site
+<div style="margin-top: 2.5rem;"></div>
 
-This site is powered by [Jekyll](https://jekyllrb.com/) and hosted on [GitHub Pages](https://pages.github.com/). Feel free to explore my [works](/works/), [experiences](/experience/), and [blog posts](/posts/).
+<div class="home-section__label">LIFE</div>
+<div class="home-section__title">Beyond the lab</div>
 
+When I'm not studying or coding, I enjoy reading, watching films, 
+exploring new places, and [writing about my experiences](/posts/). 
+This website is a space where I document my journey — both technical and personal.
+
+---
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="{{ base_path }}/posts/" class="btn btn--deep-blue-outline" style="font-size: 0.9rem !important; padding: 0.7em 2em !important;">
+    Read my blog →
+  </a>
+</div>
