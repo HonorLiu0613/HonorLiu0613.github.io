@@ -81,17 +81,17 @@ body {
 
 /* Archive item excerpt — smaller, light gray, always visible in grid */
 .grid__item .archive__item-excerpt {
-  display: block !important;      /* always show, even on mobile */
-  font-size: 0.7rem !important;   /* smaller than default */
-  color: #999 !important;          /* light gray */
+  display: block !important;
+  font-size: 0.6rem !important;
+  color: #bbb !important;
   line-height: 1.5;
   margin-top: 0.25em;
 }
 
 /* Also style excerpt in list view */
 .archive__item-excerpt {
-  font-size: 0.75rem;
-  color: #999;
+  font-size: 0.65rem;
+  color: #bbb;
 }
 
 /* Section heading for homepage sections below the hero (e.g. RESEARCH, PROJECTS) */

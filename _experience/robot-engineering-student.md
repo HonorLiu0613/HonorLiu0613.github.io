@@ -1,8 +1,8 @@
 ---
 title: "Robot Engineering Student"
-excerpt: "Undergraduate student at NEEPU, majoring in Robot Engineering."<!--介绍 -->
+excerpt: "Undergraduate student at NEEPU, majoring in Robot Engineering."
 header:
-  teaser: "500x300.png"<!--网格卡片上的图片，路径相对images/ 文件夹-->
+  teaser: "500x300.png"
 collection: experience
 date: 2024-09-01
 period: "2024 - Present"
