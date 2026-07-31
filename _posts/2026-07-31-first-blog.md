@@ -8,7 +8,7 @@ categories:
   - 
 ---
 
-这是我的第一篇博客文章！🎉
+🎉This is my first blog！
 
 这个网站终于搭建好了，以后我会在这里分享：
 
@@ -23,4 +23,4 @@ categories:
 
 > "The best time to plant a tree was 20 years ago. The second best time is now."
 
-所以就从今天开始吧！
+Let's start!
