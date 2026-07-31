@@ -79,6 +79,21 @@ body {
   color: #ffffff !important;
 }
 
+/* Archive item excerpt — smaller, light gray, always visible in grid */
+.grid__item .archive__item-excerpt {
+  display: block !important;      /* always show, even on mobile */
+  font-size: 0.7rem !important;   /* smaller than default */
+  color: #999 !important;          /* light gray */
+  line-height: 1.5;
+  margin-top: 0.25em;
+}
+
+/* Also style excerpt in list view */
+.archive__item-excerpt {
+  font-size: 0.75rem;
+  color: #999;
+}
+
 /* Section heading for homepage sections below the hero (e.g. RESEARCH, PROJECTS) */
 .home-section__label {
   font-size: 0.75rem;
