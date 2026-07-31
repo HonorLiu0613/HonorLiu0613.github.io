@@ -13,10 +13,10 @@ title                    : "Haoran Liu "
 title_separator          : "-"
 name                     : &name "Haoran Liu "
 description              : &description "Haoran Liu's academic portfolio,Robot Engineering at NEEPU,sharing studies,daily life."   # Update this with a general description of your site, this is the default if not overridden by a page
-url                      : https://Honorliu0613.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
+url                      : https://HonorLiu0613.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
                                                            # or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
-repository               : "academicpages/academicpages.github.io"
+repository               : "HonorLiu0613/HonorLiu0613.github.io"
 
 # Site Author - The following control what appear as part of the author content on the side bar.
 #               If a field is blank the icon and link will not appear, otherwise it will be shown.
@@ -50,7 +50,7 @@ author:
   bitbucket        : # Username - Update with your username on the site
   codepen          : # Username
   dribbble         : # Username
-  github           : "academicpages"
+  github           : "HonorLiu0613"
   kaggle           : # Username  
   stackoverflow    : # User number or user number and name (i.e., use "1" or "1/jeff-atwood")    
 
@@ -229,6 +229,9 @@ collections:
   portfolio:
     output: true
     permalink: /:collection/:path/
+  experience:
+    output: true
+    permalink: /:collection/:path/
   talks:
     output: true
     permalink: /:collection/:path/
@@ -276,6 +279,15 @@ defaults:
   - scope:
       path: ""
       type: portfolio
+    values:
+      layout: single
+      author_profile: true
+      share: true
+      comment: true
+  # _experience
+  - scope:
+      path: ""
+      type: experience
     values:
       layout: single
       author_profile: true
