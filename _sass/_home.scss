@@ -120,3 +120,19 @@ body {
   color: #1a1a1a;
   margin-bottom: 1.2rem;
 }
+
+/* Sidebar: bio, location, and social links — larger + light gray */
+.sidebar .author__bio {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.sidebar p {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.author__urls a {
+  font-size: 0.82rem !important;
+  color: #999 !important;
+}
