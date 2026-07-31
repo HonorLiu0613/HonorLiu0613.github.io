@@ -81,7 +81,8 @@ body {
 
 /* Date and excerpt on listing cards */
 .archive__item .page__date,
-.archive__item .page__date strong {
+.archive__item .page__date strong,
+.archive__item .page__date time {
   font-size: 0.6rem;
   color: #b85450;      /* dark brick red */
   font-weight: 400;
@@ -124,19 +125,19 @@ body {
   margin-bottom: 1.2rem;
 }
 
-/* Sidebar: bio, location, and social links — doubled size, light gray */
+/* Sidebar: bio slightly larger than links below */
 .sidebar .author__bio {
-  font-size: 1.7rem !important;
+  font-size: 1rem !important;
   color: #999 !important;
 }
 
 .sidebar p,
 .sidebar li {
-  font-size: 1.6rem !important;
+  font-size: 0.8rem !important;
   color: #999 !important;
 }
 
 .author__urls a {
-  font-size: 1.6rem !important;
+  font-size: 0.8rem !important;
   color: #999 !important;
 }
