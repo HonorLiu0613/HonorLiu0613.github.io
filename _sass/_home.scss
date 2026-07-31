@@ -88,6 +88,16 @@ body {
   margin-top: 0.25em;
 }
 
+/* Date and excerpt on listing cards — small + light gray */
+.archive__item .page__date {
+  font-size: 0.6rem;
+  color: #bbb;
+}
+.archive__item .page__date strong {
+  font-weight: 400;
+  color: #bbb;
+}
+
 /* Also style excerpt in list view */
 .archive__item-excerpt {
   font-size: 0.65rem;
