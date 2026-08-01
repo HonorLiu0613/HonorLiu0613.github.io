@@ -24,7 +24,7 @@ Participated in the RoboCup China competition qualifier round in Hangzhou.
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/hangzhou-pic.jpg" width="80%" 
      style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-     <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">洛阳理工大学参赛大牌子</p>
+     <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">杭州睿抗大合影</p>
 </div>
 ### August — Luoyang — RoboCup China (Qualifier)  
 Competed in another qualifier event in Luoyang.
