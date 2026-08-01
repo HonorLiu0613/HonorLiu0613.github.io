@@ -125,6 +125,64 @@ body {
   margin-bottom: 1.2rem;
 }
 
+/* Update section — white cards for each recent item */
+.home-update__list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+}
+
+.home-update__item {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 1.2rem 1.6rem;
+  margin-bottom: 0.8rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.home-update__item:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.home-update__item-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.home-update__item-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+.home-update__item-title:hover {
+  color: #1a3a5c;
+  text-decoration: underline;
+}
+
+.home-update__item-tag {
+  color: #6c757d;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.home-update__item-date {
+  color: #adb5bd;
+  font-size: 0.78rem;
+  margin-left: auto;
+}
+
+.home-update__item-excerpt {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85rem;
+  color: #888888;
+  line-height: 1.5;
+}
+
 /* Sidebar: bio slightly larger than links below */
 .sidebar .author__bio {
   font-size: 1rem !important;

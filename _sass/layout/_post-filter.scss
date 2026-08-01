@@ -138,8 +138,17 @@
 }
 
 .post-card-item {
-  padding: 1.2em 0;
-  border-bottom: 1px solid var(--global-border-color);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 1.2rem 1.6rem;
+  margin-bottom: 0.8rem;
+  border-bottom: none;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
 
   &.hidden {
     display: none;
@@ -148,7 +157,7 @@
 
 .post-card-title {
   margin: 0 0 0.15em;
-  font-size: $type-size-5;
+  font-size: 1.1rem;
   font-weight: 600;
   line-height: 1.3;
 

@@ -40,6 +40,47 @@ When I'm not studying or coding, I enjoy reading, watching films,
 exploring new places, and [writing about my experiences](/posts/). 
 This website is a space where I document my journey — both technical and personal.
 
+<div style="margin-top: 2.5rem;"></div>
+
+{% assign all_updates = "" | split: "" %}
+{% for post in site.posts %}
+  {% assign all_updates = all_updates | push: post %}
+{% endfor %}
+{% for item in site.portfolio %}
+  {% assign all_updates = all_updates | push: item %}
+{% endfor %}
+{% for item in site.experience %}
+  {% assign all_updates = all_updates | push: item %}
+{% endfor %}
+
+{% assign sorted_updates = all_updates | sort: "date" | reverse %}
+
+<div class="home-section__label">UPDATE</div>
+<div class="home-section__title">Recently updated</div>
+
+<div class="home-update__list">
+{% for item in sorted_updates limit: 5 %}
+  <div class="home-update__item">
+    <div class="home-update__item-row">
+      <a href="{{ base_path }}{{ item.url }}" class="home-update__item-title">{{ item.title }}</a>
+      <span class="home-update__item-tag">
+        {% if item.collection == "posts" %}
+          [Blog]
+        {% elsif item.collection == "portfolio" %}
+          [Works]
+        {% elsif item.collection == "experience" %}
+          [Experience]
+        {% endif %}
+      </span>
+      <span class="home-update__item-date">{{ item.date | date: "%Y-%m-%d" }}</span>
+    </div>
+    {% if item.excerpt %}
+      <p class="home-update__item-excerpt">{{ item.excerpt | strip_html | truncate: 100 }}</p>
+    {% endif %}
+  </div>
+{% endfor %}
+</div>
+
 ---
 
 <div style="text-align: center; margin-top: 2rem;">
