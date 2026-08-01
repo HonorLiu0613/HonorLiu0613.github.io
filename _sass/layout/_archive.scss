@@ -10,7 +10,7 @@
   }
 
   @include breakpoint($large) {
-    @include span(10 of 12 last);
+    @include span(9 of 12 last);
     @include prefix(0.5 of 12);
   }
 
@@ -129,7 +129,7 @@
   }
 
   @include breakpoint($small) {
-    @include gallery(5 of 10);
+    @include gallery(1 of 2);
     .archive__item-teaser {
       max-height: 200px;
     }
@@ -138,7 +138,7 @@
   @include breakpoint($medium) {
     margin-left: 0; /* reset before mixin does its thing*/
     margin-right: 0; /* reset before mixin does its thing*/
-    @include gallery(2.5 of 10);
+    @include gallery(1 of 3);
 
     .archive__item-teaser {
       max-height: 120px;
