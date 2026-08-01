@@ -7,16 +7,40 @@ collection: experience
 date: 2026-8-01
 period: "2023 - 2025"
 ---
+<style>
+/* 一级标题 # */
+h1 {
+    font-size: 32px !important;
+    font-weight: 700;
+    margin: 16px 0 8px 0;
+}
+/* 二级标题 ## */
+h2 {
+    font-size: 26px !important;
+    font-weight: 600;
+    margin: 14px 0 6px 0;
+}
+/* 三级标题 ### */
+h3 {
+    font-size: 24px !important;
+    font-weight: 600;
+    margin: 12px 0 4px 0;
+}
 
+/* 正文默认字号 */
+body {
+    font-size: 20px;
+}
+</style>
 My robotics competition journey spanning three years, from RoboCup to information security contests.
 
 <!-- 插图片：图片放到 images/ 文件夹 -->
 <!-- ![RoboCup比赛现场](/images/robocup-photo.jpg) -->
 ---
 
-## 2024
+# 2024
 
-### August — Hangzhou — RoboCup China (Qualifier)
+## August — Hangzhou — RoboCup China (Qualifier)
 Participated in the RoboCup China competition qualifier round in Hangzhou.
 
 第一年，我没有参加睿抗的比赛，所以没有去，附一张队友在杭州的比赛照片~ ~~谢老板每年去杭州比赛都要找女朋友~~
@@ -38,7 +62,7 @@ Competed in another qualifier event in Luoyang.
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">洛阳理工大学参赛大牌子</p>
 </div>
 
-### October — Xi'an — RoboCup China Finals
+## October — Xi'an — RoboCup China Finals
 Reached the national finals in Xi'an. An intense and rewarding experience.
 
 **地点：西安奥体中心**  
@@ -58,7 +82,7 @@ Reached the national finals in Xi'an. An intense and rewarding experience.
 </div>
 
 
-### December — Xiamen — Information Security & Countermeasure Competition
+## December — Xiamen — Information Security & Countermeasure Competition
 Switched gears to compete in information security in Xiamen.
 
 **地点：厦门理工大学**  
@@ -73,9 +97,9 @@ Switched gears to compete in information security in Xiamen.
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">集美学村以及张老师力推的烤生蚝</p>
 </div>
 
-## 2025
+# 2025
 
-### August — Yantai — RoboCup China (Qualifier)
+## August — Yantai — RoboCup China (Qualifier)
 Back for another season of RoboCup competition.
 
 **地点：哈尔滨工程大学（烟台校区）**
@@ -87,14 +111,14 @@ Back for another season of RoboCup competition.
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">没有我的合影</p>
 </div>
 
-### August — Hangzhou — Ruirang Robot Developer Contest
+## August — Hangzhou — Ruirang Robot Developer Contest
 Took on a new challenge at the robot developer contest in Hangzhou.
 
 **地点：余杭区 人工智能小镇**
 
 吸取了在烟台比赛的经验进行了修正，比赛结果也还可以，但是杭州的天气真的热，<span style="color:#b85450;">杭州的夏天真的热</span>。在西湖边上玩了一下，水都是热的。(PS:作者头像就是在西湖拍的)不过也感受到杭州对创业的包容，以及杭州人在休闲时刻的松驰感。
 
-### October — Shijiazhuang — RoboCup China Finals
+## October — Shijiazhuang — RoboCup China Finals
 Second year reaching the national finals.
 
 由于学业原因，石家庄本人没有去，只是提供了线上答疑的服务。此时参赛重心也慢慢的移交给了学弟学妹们(2024级)，附图是比赛现场。
@@ -105,7 +129,7 @@ Second year reaching the national finals.
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">2023级与2024级同学合影</p>
 </div>
 
-### December — Kunming — Information Security & Countermeasure Competition
+## December — Kunming — Information Security & Countermeasure Competition
 Closed out the year with another security competition in Kunming.
 
 **地点：昆明理工大学**
@@ -117,6 +141,8 @@ Closed out the year with another security competition in Kunming.
      style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">昆明理工大学参赛大牌子</p>
 </div>
+
+<br><br>
 
 至此我的机器人竞赛生涯就结束了，祝愿学弟学妹们取得更好的成绩。
 ---
