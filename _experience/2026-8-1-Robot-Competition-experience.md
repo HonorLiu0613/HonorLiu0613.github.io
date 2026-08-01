@@ -47,7 +47,7 @@ Participated in the RoboCup China competition qualifier round in Hangzhou.
 
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/hangzhou-pic.jpg" width="80%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">杭州睿抗大合影</p>
 </div>
 ### August — Luoyang — RoboCup China (Qualifier)  
@@ -58,7 +58,7 @@ Competed in another qualifier event in Luoyang.
 名义上是我第一次参加的比赛，所以对待的格外认真，我比的项目是舞蹈机器人，<span style="color:#b85450;">赛场是有空调感觉很舒服</span>，但是楼下的赛场（农业机器人）没有，还是很辛苦的。最终取得的成绩还可以，~~洛阳真的太热了~~
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/luoyang-pic.jpg" width="75%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">洛阳理工大学参赛大牌子</p>
 </div>
 
@@ -70,14 +70,14 @@ Reached the national finals in Xi'an. An intense and rewarding experience.
 参赛的学校与队伍很多，大家都很有热情，感受到青春的氛围，共同进步。最后比赛的结果也是意料之中。
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/xian-pic1.jpg" width="40%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
 <img src="/images/2026-8-1-Robot-Competition-experience/xian-pic2.jpg" width="40%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      
 <img src="/images/2026-8-1-Robot-Competition-experience/xian-pic3.jpg" width="40%"
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
 <img src="/images/2026-8-1-Robot-Competition-experience/xian-pic4.jpg" width="40%"
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">比赛现场以及西安碳水美食~</p>
 </div>
 
@@ -91,9 +91,9 @@ Switched gears to compete in information security in Xiamen.
 
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/xiamen-pic1.jpg" width="30%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
 <img src="/images/2026-8-1-Robot-Competition-experience/xiamen-pic2.jpg" width="40%"
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">集美学村以及张老师力推的烤生蚝</p>
 </div>
 
@@ -107,7 +107,7 @@ Back for another season of RoboCup competition.
 由于新赛季改了规则，备赛期间以及比赛期间一直在改代码改算法。烟台我算是没少去了，经常去烟台找刘同学(在烟台上学).<span style="color:#b85450;">比赛期间也是一直在调车加逻辑</span>，四六级出分的那天是早上六点，我和谢老板还没睡，我们把团队成员的四六级成绩查了个遍，~~几家欢喜几家愁~~。这次研究生宏哥和峥哥也因为暑假留校跟我们来参加比赛了，为我们保证了坚实的后勤保障，赞！
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/yantai-pic.jpg" width="60%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">没有我的合影</p>
 </div>
 
@@ -125,7 +125,7 @@ Second year reaching the national finals.
 
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/shijiazhuang-pic.jpg" width="60%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">2023级与2024级同学合影</p>
 </div>
 
@@ -138,7 +138,7 @@ Closed out the year with another security competition in Kunming.
 
 <div align="center">
 <img src="/images/2026-8-1-Robot-Competition-experience/kunming-pic.jpg" width="80%" 
-     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+     style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">昆明理工大学参赛大牌子</p>
 </div>
 
