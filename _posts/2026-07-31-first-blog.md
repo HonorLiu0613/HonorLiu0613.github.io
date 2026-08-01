@@ -21,6 +21,6 @@ categories:
 
 博客使用 [Jekyll](https://jekyllrb.com/) 搭建，托管在 [GitHub Pages](https://pages.github.com/) 上。写博客的目的是记录成长过程中的点滴，也希望和更多志同道合的朋友交流。
 
-> "The best time to plant a tree was 20 years ago. The second best time is now."
+>"The best time to plant a tree was 20 years ago.The second best time is now."
 
 Let's start!
