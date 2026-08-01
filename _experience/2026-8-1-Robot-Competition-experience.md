@@ -4,7 +4,7 @@ excerpt: "Competition journey from 2023 to 2025 — RoboCup, information securit
 header:
   teaser: "2026-8-1-Robot-Competition-experience/depart-cover.jpg"
 collection: experience
-date: 2025-12-01
+date: 2026-8-01
 period: "2023 - 2025"
 ---
 
