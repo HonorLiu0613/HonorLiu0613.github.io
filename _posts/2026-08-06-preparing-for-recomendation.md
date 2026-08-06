@@ -24,4 +24,4 @@ tags:
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">背背背......</p>
 </div>
 
-祝大家都能上心仪的梦想(ง •_•)ง
+祝大家都能上心仪的梦校(ง •_•)ง
