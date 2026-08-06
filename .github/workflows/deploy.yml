@@ -1,11 +1,11 @@
-name: Deploy Jekyll site
+name: Deploy
 
 on:
   push:
     branches: [master]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,12 +15,9 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Build site
-        run: bundle exec jekyll build
+      - run: bundle exec jekyll build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
-          publish_branch: gh-pages
