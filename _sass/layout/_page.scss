@@ -396,22 +396,16 @@
   padding-top: 1em;
   border-top: 1px solid var(--global-border-color);
   @include clearfix();
-  float: left;
-
-  @include breakpoint($large) {
-    @include pre(1 of 12);
-  }
+  clear: both;
 
   a {
     color: inherit;
     text-decoration: none;
   }
-}
 
-.page__related {
   .grid__item {
     @include breakpoint($medium) {
-      @include gallery(1 of 2);
+      @include gallery(1 of 3);
     }
   }
 }
@@ -420,4 +414,5 @@
   margin-bottom: 10px;
   font-size: $type-size-6;
   text-transform: uppercase;
+  text-align: center;
 }
