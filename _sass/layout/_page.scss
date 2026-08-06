@@ -50,13 +50,27 @@
 
 .page__content {
 
+  /* heading sizes */
+  h1 {
+    font-size: 2rem !important;   /* 32px */
+    font-weight: 700;
+    margin: 1rem 0 0.5rem 0;
+  }
   h2 {
     padding-bottom: 0.5em;
     border-bottom: 1px solid var(--global-border-color);
+    font-size: 1.625rem !important; /* 26px */
+    font-weight: 600;
+    margin: 0.875rem 0 0.375rem 0;
+  }
+  h3 {
+    font-size: 1.5rem !important;   /* 24px */
+    font-weight: 600;
+    margin: 0.75rem 0 0.25rem 0;
   }
 
   p, li, dl {
-    font-size: 1em;
+    font-size: 1.25rem;  /* 20px */
   }
 
   /* paragraph indents */

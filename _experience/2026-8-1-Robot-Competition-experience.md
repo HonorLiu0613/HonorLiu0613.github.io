@@ -7,31 +7,7 @@ collection: experience
 date: 2026-8-01
 period: "2023 - 2025"
 ---
-<style>
-/* 一级标题 # */
-h1 {
-    font-size: 32px !important;
-    font-weight: 700;
-    margin: 16px 0 8px 0;
-}
-/* 二级标题 ## */
-h2 {
-    font-size: 26px !important;
-    font-weight: 600;
-    margin: 14px 0 6px 0;
-}
-/* 三级标题 ### */
-h3 {
-    font-size: 24px !important;
-    font-weight: 600;
-    margin: 12px 0 4px 0;
-}
 
-/* 正文默认字号 */
-body {
-    font-size: 20px;
-}
-</style>
 My robotics competition journey spanning three years, from RoboCup to information security contests.
 
 <!-- 插图片：图片放到 images/ 文件夹 -->
