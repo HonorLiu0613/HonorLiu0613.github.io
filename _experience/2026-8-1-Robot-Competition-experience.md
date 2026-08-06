@@ -50,7 +50,8 @@ Participated in the RoboCup China competition qualifier round in Hangzhou.
      style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" loading="lazy">
      <p style="margin-top: 8px; font-size: 12px; color: #888; margin-bottom: 12px;">杭州睿抗大合影</p>
 </div>
-### August — Luoyang — RoboCup China (Qualifier)  
+
+## August — Luoyang — RoboCup China (Qualifier)  
 Competed in another qualifier event in Luoyang.
 
 **地点：洛阳理工大学**  
