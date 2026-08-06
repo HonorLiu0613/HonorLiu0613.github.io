@@ -399,12 +399,20 @@
   float: left;
 
   @include breakpoint($large) {
-    @include pre(2.5 of 12);
+    @include pre(1 of 12);
   }
 
   a {
     color: inherit;
     text-decoration: none;
+  }
+}
+
+.page__related {
+  .grid__item {
+    @include breakpoint($medium) {
+      @include gallery(1 of 2);
+    }
   }
 }
 

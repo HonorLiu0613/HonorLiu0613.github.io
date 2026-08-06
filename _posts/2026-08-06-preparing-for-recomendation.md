@@ -6,8 +6,10 @@ tags:
   - recommendation
 ---
 
+记录最近推免备战ing......
 
 # Ready for Recommendation... a little bit tired
+
 ## rencently mood
 
 最近一直在准备保研推免，简历关，专业课关，英语关，面试关......希望能顺利通过吧，去到心意的学校，随手附图(●'◡'●)
