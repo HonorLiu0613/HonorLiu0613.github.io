@@ -1,5 +1,5 @@
 ---
-title: 'Ready for Recommendation... a little bit tired'
+title: 'Ready for Recommendation...'
 date: 2026-08-06
 tags:
   - blogs
@@ -8,7 +8,7 @@ tags:
 
 记录最近推免备战ing......
 
-# Ready for Recommendation... a little bit tired
+# Ready for Recommendation... 
 
 ## rencently mood
 
