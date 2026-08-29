@@ -4,7 +4,7 @@ excerpt: "This is a Derivation to kalman filter."
 header:
   teaser: "2026-08-29-Derivation-to-kalman-filter/web.png"
 collection: portfolio
-mathjax: true
+# mathjax: true
 date: 2026-08-29
 ---
 
@@ -382,6 +382,16 @@ $$P_k = ( I- K_k H)P^-_{k}( I- K_k H)^\top + K_kR K_k^\top$$
 后续有机会将更新关于非线性系统EKF的推导，欢迎批评指正。
 
 
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],
+    displayMath: [['$$','$$']],
+    packages: {'[+]': ['ams']}
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 
 
