@@ -253,13 +253,13 @@ $$
 
 
 $$
-  = tr(P_{k}^{-}) + tr( K_{k}Q K_{k}^\top) + tr(K_{k}HP_{k}^{-}H K_{k}^\top) - tr(P_{k}^{-}H K_{k}^\top) - tr(K_{k}HP_{k}^{-})\tag{29}
+  = tr(P_{k}^{-}) + tr( K_{k}Q K_{k}^\top) + tr(K_{k}HP_{k}^{-}H^\top K_{k}^\top) - tr(P_{k}^{-}H K_{k}^\top) - tr(K_{k}HP_{k}^{-})\tag{29}
 $$
 
 由于 $P_{k}^{-}$ 是先验误差的协方差矩阵，因此 $P_{k}^{-} = P_{k}^{-\top}$ ，所以 $tr(P_{k}^{-}) = P_{k}^{-\top}$ ，不难看出公式29后两项是互为转置的，其迹相等，所以公式29可以化简为：
 
 $$
-tr(P_{k}) = tr(P_{k}^{-}) + tr( K_{k}Q K_{k}^\top) + tr(K_{k}HP_{k}^{-}H K_{k}^\top)+2tr(K_{k}HP_{k}^{-}) \tag{30}
+tr(P_{k}) = tr(P_{k}^{-}) + tr( K_{k}Q K_{k}^\top) + tr(K_{k}HP_{k}^{-}H^\top K_{k}^\top)+2tr(K_{k}HP_{k}^{-}) \tag{30}
 $$
 
 还记得我们的初心：找到一个$K_{k}$使得$trace$最小，所以我们需要对$K_{k}$求导，并令其等于0，则：
@@ -275,7 +275,7 @@ $$
 $$
 
 $$
-\frac{\partial tr(K_{k}HP_{k}^{-}H K_{k}^\top)}{\partial K_{k}}  = 2K_{k} H P_{k}^{-} H \tag{33}
+\frac{\partial tr(K_{k}HP_{k}^{-}H^\top K_{k}^\top)}{\partial K_{k}}  = 2K_{k} H P_{k}^{-} H^\top \tag{33}
 $$
 
 
@@ -286,20 +286,20 @@ $$
 代入公式31整理得：
 
 $$
-\frac{\partial tr(P_{k})}{\partial K_{k}} = 2Q K_{k} + 2K_{k} H P_{k}^{-} H - 2 P_{k}^{-}H^\top = 0 \tag{35}
+\frac{\partial tr(P_{k})}{\partial K_{k}} = 2Q K_{k} + 2K_{k} H P_{k}^{-} H^\top - 2 P_{k}^{-}H^\top = 0 \tag{35}
 $$
 
 $$
-Q K_{k} + K_{k} H P_{k}^{-} H -  P_{k}^{-}H^\top = 0 \tag{36}
+Q K_{k} + K_{k} H P_{k}^{-} H^\top -  P_{k}^{-}H^\top = 0 \tag{36}
 $$
 
 $$
-K_{k} (Q + H P_{k}^{-} H) = P_{k}^{-}H^\top \tag{37}
+K_{k} (Q + H P_{k}^{-} H^\top) = P_{k}^{-}H^\top \tag{37}
 $$
 
 
 $$
-K_{k} = P_{k}^{-}H^\top (Q + H P_{k}^{-} H)^{-1} \tag{38}
+K_{k} = P_{k}^{-}H^\top (Q + H P_{k}^{-} H^\top)^{-1} \tag{38}
 $$
 
 其中$P_{k}^{-}$是先验误差的协方差矩阵，$H$是观测矩阵，$Q$是测量噪声的协方差矩阵。至此我们费了很多功夫推导出了卡尔曼增益$K_{k}$。
@@ -370,7 +370,7 @@ $$P_{k}^{-} = A P_{k-1} A^\top + Q$$
 
 （2）测量更新阶段：引入 $k$ 时刻传感器观测信息，对先验预测结果进行修正，得到当前时刻最优后验估计。首先计算卡尔曼增益，自适应权衡模型预测可信度与传感器观测可信度：
 
-$$K_{k} = P_{k}^{-}H^\top (H P_{k}^{-} H + R)^{-1}$$
+$$K_{k} = P_{k}^{-}H^\top (H P_{k}^{-} H^\top + R)^{-1}$$
 
 随后利用观测残差修正先验状态，观测残差反映实际观测值与模型预测观测值的偏差，通过卡尔曼增益加权修正后，得到当前时刻最优状态估计：
 
