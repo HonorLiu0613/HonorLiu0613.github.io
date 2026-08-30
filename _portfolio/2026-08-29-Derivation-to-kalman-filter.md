@@ -92,7 +92,7 @@ $$
 \hat{x}_{k}=\hat{x}^-_{k}+\frac{1}{k}(x_{k}-\hat{x}^-_{k}) \tag{6}
 $$
 
-$\hat{x}_{k}$是后验估计，$\hat{x}^-_{k}$是先验估计，$x_{k}$是实际值，$G$的范围是0到1，带入公式5，则公式6可以写成：
+$\hat{x}_{k}$是后验估计，$\hat{x}^-_{k}$是先验估计，$x_k$实际值，$G$的范围是0到1，带入公式5，则公式6可以写成：
 
 $$
 \hat{x}_{k}=\hat{x}^-_{k}+G(H^{-1}{z}_{k}-\hat{x}^-_{k}) \tag{7}
@@ -108,8 +108,13 @@ $$
 =\hat{x}^-_{k}+K_k({z}_{k}-H\hat{x}^-_{k}) \tag{8}
 $$
 
-其中$ K_k\in\left[ 0, H^{-1}\right]$，当$ K_k= H^{-1}$时，$\hat{x}_{k} = H^{-1}{z}_{k} = {x}_{k}$说明更相信测量值，当$ K_k=0$时，$\hat{x}_{k} = \hat{x}^-_{k} = {x}_{k}$说明更相信估计值。
-因此我们的目标是找到一个$K_k$,使得$\hat{x}_{k}$更接近${x}_{k}$。
+其中$ K_k\in\left[ 0, H^{-1}\right]$
+当$ K_k= H^{-1}$ 时, 
+$\hat{x}_{k}=H^{-1}z_{k}={x}_{k}$ 
+说明更相信测量值。
+当$ K_k=0$时，$ \hat{x}_{k} = \hat{x}^{{-}}_{k}$ 
+说明更相信估计值。
+因此我们的目标是找到一个$K_k$,使得 $\hat{x}_{k}$更接近${x}_{k}$ 。
 引入误差方程：
 
 $$
@@ -178,7 +183,7 @@ $$
 = (I - K_kH)(x_{k} - \hat{x}^-_{k}) - K_kv_k \tag{18}
 $$
 
-定义$e^-_{k} = x_{k} - \hat{x}^-_{k}$，$e^-_{k}$为先验误差：
+定义 $e^-_{k} = x_{k} - \hat{x}^-_{k}$，$e^-_{k}$ 为先验误差：
 代入公式12，求$P_k$:
 
 $$
@@ -195,20 +200,20 @@ $$
 整理得：
 
 $$
-=\mathbb{E}[( I- K_k H) e_k^-{ e_k^-}^\top( I- K_k H)^\top +  K_k v_k{ v_k}^\top K_k^\top - ( I- K_k H) e_k^-{ v_k}^\top K_k^\top -  K_k v_k{ e_k^-}^\top( I- K_k H)^\top \tag{20}
+=\mathbb{E}[( I- K_k H) e_k^-{ e_k^-}^\top( I- K_k H)^\top +  K_k v_k{ v_k}^\top K_k^\top - ( I- K_k H) e_k^-{ v_k}^\top K_k^\top -  K_k v_k{ e_k^-}^\top( I- K_k H)^\top] \tag{20}
 $$
 
 先看后两项：
 对其求均值：
 
 $$
-\mathbb{E}[(I- K_k H) e_k^-{ v_k}^\top K_k^\top -  K_k v_k{ e_k^-}^\top( I- K_k H)^\top \tag{21}
+\mathbb{E}[(I- K_k H) e_k^-{ v_k}^\top K_k^\top -  K_k v_k{ e_k^-}^\top( I- K_k H)^\top] \tag{21}
 $$
 
 $( I- K_k H)$和 $K_k^\top$是常数，所以可以提出：
 
 $$
-\mathbb{E}[( I- K_k H) e_k^-{ v_k}^\top K_k^\top -  K_k v_k{ e_k^-}^\top( I- K_k H)^\top \tag{22}
+\mathbb{E}[( I- K_k H) e_k^-{ v_k}^\top K_k^\top -  K_k v_k{ e_k^-}^\top( I- K_k H)^\top] \tag{22}
 $$
 
 
@@ -220,7 +225,7 @@ $$
 $\mathbb{E}[e_k^-{ v_k}^\top] = \mathbb{E}[e_k^-]\mathbb{E}[v_k^\top] = 0$，所以公式20可化简：
 
 $$
-\mathbb{E}[(I- K_k H) e_k^-{ e_k^-}^\top( I- K_k H)^\top +  K_k v_k{ v_k}^\top K_k^\top\tag{24}
+\mathbb{E}[(I- K_k H) e_k^-{ e_k^-}^\top( I- K_k H)^\top +  K_k v_k{ v_k}^\top K_k^\top ] \tag{24}
 $$
 
 把常数项提出：
@@ -252,7 +257,7 @@ $$
   = tr(P^-_{k}) + tr( K_kQ K_k^\top) + tr(K_kHP^-_{k}H K_k^\top) - tr(P^-_{k}H K_k^\top) - tr(K_kHP^-_{k})\tag{29}
 $$
 
-由于$P^-_{k}$是先验误差的协方差矩阵，因此$P^-_{k} = P^{-\top}_{k}$，所以$tr(P^-_{k}) = P^{-\top}_{k}$，不难看出公式29后两项是互为转置的，其迹相等，所以公式29可以化简为：
+由于 $P^-_{k}$ 是先验误差的协方差矩阵，因此 $P^-_{k} = P^{-\top}_{k}$ ，所以 $tr(P^-_{k}) = P^{-\top}_{k}$ ，不难看出公式29后两项是互为转置的，其迹相等，所以公式29可以化简为：
 
 $$
 tr(P_k) = tr(P^-_{k}) + tr( K_kQ K_k^\top) + tr(K_kHP^-_{k}H K_k^\top)+2tr(K_kHP^-_{k}) \tag{30}
