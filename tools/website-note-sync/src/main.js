@@ -53,9 +53,16 @@ module.exports=class WebsiteNoteSync extends Plugin {
     new Notice('发布属性已补充。写好后勾选 publish，再预览同步。');
   }
   async save() {this.data={...this.data,settings:this.settings,state:this.state};await this.saveData(this.data);}
+  async pendingPublicationNotes() {
+    return (await this.plan()).items.filter(item=>!['equal','skip'].includes(item.action));
+  }
   async previewPush() {
     if(this.running||this.publishing)return new Notice('正在同步或发布，请完成后再试。');
-    try{new PushPreview(this.app,this,await publisher.plan(this.root(),this.settings)).open();}
+    try{
+      const pending=await this.pendingPublicationNotes();
+      if(pending.length)return new PendingPublication(this.app,this,pending).open();
+      new PushPreview(this.app,this,await publisher.plan(this.root(),this.settings)).open();
+    }
     catch(error){new Notice('无法准备发布：'+error.message,12000);console.error(error);}
   }
   async pushWebsite(expectedPlan,message) {
@@ -63,7 +70,15 @@ module.exports=class WebsiteNoteSync extends Plugin {
     this.publishing=true;
     try {
       const root=this.root();
+      const pending=await this.pendingPublicationNotes();
+      if(pending.length)throw new Error('有 '+pending.length+' 篇笔记尚未同步，请先预览同步并处理冲突，再推送网站。');
       if(this.settings.buildBeforePush)await this.buildWebsite(root);
+      const current=await publisher.plan(root,this.settings);
+      if(publisher.signature(current)!==publisher.signature(expectedPlan))throw new Error('预览后网站仓库有改动，请重新预览。');
+      if(current.files.length===0&&current.ahead===0){
+        new Notice('没有新版本可发布：网站文件没有改动，也没有待推送提交。',10000);
+        return {unchanged:true,commit:current.head,committed:false,files:0,remote:current.remote,branch:current.branch};
+      }
       const result=await publisher.publish(root,this.settings,expectedPlan,message);
       this.data.lastPush={...result,time:new Date().toISOString()};await this.save();
       new Notice('已推送到 '+result.remote+'/'+result.branch+'；GitHub Actions 正在部署，请稍后查看线上网站。',12000);
@@ -147,7 +162,12 @@ module.exports=class WebsiteNoteSync extends Plugin {
       const allowed=plan.mode==='vault-to-web'?['vault','skip']:plan.mode==='web-to-vault'?['web','skip']:['vault','web','skip'];
       const conflicts=plan.items.filter(item=>item.action==='conflict'&&!resolutions[item.id]);
       if(conflicts.length)throw new Error('有需要确认的版本冲突，尚未覆盖任何笔记：'+conflicts.map(x=>x.title).join('、'));
-      for(const item of plan.items)if(item.action==='conflict'&&!allowed.includes(resolutions[item.id]))throw new Error('冲突处理方式不符合当前同步方向。');
+      for(const item of plan.items)if(item.action==='conflict') {
+        const resolution=resolutions[item.id];
+        const withdrawMissing=resolution==='withdraw'&&!item.v&&item.w&&item.base&&plan.mode!=='web-to-vault';
+        if(!withdrawMissing&&!allowed.includes(resolution))throw new Error('冲突处理方式不符合当前同步方向。');
+        if(resolution==='vault'&&!item.v||resolution==='web'&&!item.w)throw new Error('所选版本已不存在，请选择其他处理方式。');
+      }
       // Verify the exact versions used to prepare the plan before touching either side.
       for(const item of plan.items) {
         if(item.v&&await this.app.vault.read(item.v.file)!==item.v.raw)throw new Error('笔记正在修改，请重新预览：'+item.title);
@@ -160,7 +180,7 @@ module.exports=class WebsiteNoteSync extends Plugin {
       let imported=0,withdrawn=0,skipped=0;
       for(const item of plan.items) {
         let action=item.action;
-        if(action==='conflict')action=resolutions[item.id]==='web'?'import':resolutions[item.id]==='vault'?'export':'skip';
+        if(action==='conflict')action=resolutions[item.id]==='web'?'import':resolutions[item.id]==='vault'?'export':resolutions[item.id]==='withdraw'?'withdraw':'skip';
         if(action==='skip'){skipped++;continue;}
         if(plan.mode==='web-to-vault'&&action==='equal')continue;
         await this.backup('vault/'+item.vaultPath,item.v?.raw);
@@ -347,8 +367,9 @@ class SyncPreview extends Modal {
       const setting=new Setting(this.contentEl).setName(item.title).setDesc(labels[item.action]+' · '+item.vaultPath+' ↔ '+item.webPath);
       if(item.action==='conflict')setting.addDropdown(drop=>{
         const options={'':'请选择处理方式'};
-        if(this.plan.mode!=='web-to-vault')options.vault='以 Obsidian 版本更新网站';
-        if(this.plan.mode!=='vault-to-web')options.web='以网站版本更新 Obsidian';
+        if(this.plan.mode!=='web-to-vault'&&item.v)options.vault='以 Obsidian 版本更新网站';
+        if(this.plan.mode!=='vault-to-web'&&item.w)options.web=item.v?'以网站版本更新 Obsidian':'将网站版本恢复到 Obsidian';
+        if(!item.v&&item.w&&item.base&&this.plan.mode!=='web-to-vault')options.withdraw='从网站撤下这篇已删除的笔记';
         options.skip='暂时跳过';
         drop.addOptions(options).onChange(value=>{this.resolutions[item.id]=value;});
       });
@@ -376,16 +397,29 @@ class PushPreview extends Modal {
       const list=this.contentEl.createEl('pre');list.style.cssText='max-height:280px;overflow:auto;white-space:pre-wrap;font-size:12px;';
       list.textContent=this.plan.files.map(file=>file.status+'  '+file.path).join('\n');
       new Setting(this.contentEl).setName('提交说明').addText(text=>text.setValue(this.message).onChange(value=>{this.message=value;}));
-    }else this.contentEl.createEl('p',{text:'工作区没有待提交文件；会推送现有本地提交。'});
+    }else this.contentEl.createEl('p',{text:this.plan.ahead===0?'没有新版本可发布：网站文件没有改动，也没有待推送提交。':'工作区没有待提交文件；会推送现有本地提交。'});
     const progress=this.contentEl.createEl('p');
-    new Setting(this.contentEl).addButton(button=>button.setButtonText(this.plan.files.length?'提交并推送':'推送现有提交').setCta().onClick(async()=>{
+    new Setting(this.contentEl).addButton(button=>button.setButtonText(this.plan.files.length?'提交并推送':this.plan.ahead===0?'没有新版本':'推送现有提交').setDisabled(!this.plan.files.length&&this.plan.ahead===0).setCta().onClick(async()=>{
       button.setDisabled(true);progress.textContent=this.plugin.settings.buildBeforePush?'正在构建、提交并推送…':'正在提交并推送…';
       try{
         const result=await this.plugin.pushWebsite(this.plan,this.message);
+        if(result.unchanged){progress.textContent='没有新版本可发布。';button.setButtonText('没有新版本');return;}
         progress.textContent='推送成功：'+result.commit.slice(0,7)+'。线上更新还需等待 GitHub Actions 部署完成。';
         button.setButtonText('已推送');
       }catch(error){progress.textContent=error.message;new Notice(error.message,15000);console.error(error);button.setButtonText('关闭后重新预览');}
     })).addButton(button=>button.setButtonText('关闭').onClick(()=>this.close()));
+  }
+  onClose(){this.contentEl.empty();}
+}
+class PendingPublication extends Modal {
+  constructor(app,plugin,items){super(app);this.plugin=plugin;this.items=items;}
+  onOpen(){
+    this.contentEl.createEl('h2',{text:'先同步笔记，再发布网站'});
+    this.contentEl.createEl('p',{text:'检测到 '+this.items.length+' 篇笔记尚未同步。直接推送网站仓库不会包含这些 Obsidian 修改。'});
+    const labels={export:'待导出',import:'待导入',withdraw:'待从网站撤下',conflict:'需要处理版本冲突'};
+    for(const item of this.items)new Setting(this.contentEl).setName(item.title).setDesc((labels[item.action]||item.action)+' · '+item.vaultPath);
+    new Setting(this.contentEl).addButton(button=>button.setButtonText('先预览同步').setCta().onClick(()=>{this.close();this.plugin.preview();}))
+      .addButton(button=>button.setButtonText('关闭').onClick(()=>this.close()));
   }
   onClose(){this.contentEl.empty();}
 }
