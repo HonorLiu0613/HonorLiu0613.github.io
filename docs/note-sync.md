@@ -66,8 +66,10 @@ Obsidian 是日常写作入口。网站保留可编辑的 Markdown，作为公�
 
 ## 公开范围
 
-只有 YAML 属性 `publish: true` 的笔记会首次导出。已导入的网站 5 篇笔记保留公开状态，
-原有其他笔记保持私人状态。
+只有 YAML 属性 `publish: true` 的笔记会首次导出。
+2026-11-14 按用户要求，已将当前 12 篇正式 Markdown 笔记统一补齐属性并全部标为公开，
+包括“测试”和“UDP与TCP协议”两篇暂无正文的笔记。模板、绘图源文件、插件脚本和附件
+不作为独立文章发布；笔记引用的图片仍正常导出。以后新建笔记默认仍为草稿。
 
 ```yaml
 ---
@@ -105,6 +107,15 @@ web_slug: pid-control
 | `wechat-family-menu.md` | `04-项目实验/2. 微信小程序/` |
 | `hello-world.md` | `05-闲杂随记/` |
 | `recommendation-preparation.md` | `05-闲杂随记/` |
+| `deep-learning-roadmap.md` | `00-首页/` |
+| `transpose-convolution.md` | `02-知识笔记/1. 深度学习/` |
+| `upsampling-and-downsampling.md` | `02-知识笔记/1. 深度学习/` |
+| `px4-ubuntu-setup.md` | `02-知识笔记/2. 无人机 PX4-ROS2/` |
+| `micro-xrce-dds-bridge.md` | `02-知识笔记/2. 无人机 PX4-ROS2/` |
+| `tcp-udp-protocols.md` | `01-收集箱/` |
+| `scratch-note.md` | `01-收集箱/` |
+
+表中是网站的英文文件名；Obsidian 内保留原有中文文件名和目录，使用 `web_id` 对应。
 
 新的网站笔记首次导入时按领域、标题、标签分类；主题不明确的进入 `05-闲杂随记`。
 已经对应的笔记以稳定标识关联，可以在 Obsidian 中移动文件夹。

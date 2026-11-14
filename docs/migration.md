@@ -46,4 +46,6 @@ redirects lead to pages that reference the new assets.
 The five public notes now have corresponding classified Markdown files in the Obsidian vault.
 Website Note Sync synchronizes their content manually in either direction, detects conflicts,
 exports native article HTML and assets, and captures scoped Border reading styles.
-See [the usage guide](note-sync.md). Existing private vault notes remain outside the website.
+See [the usage guide](note-sync.md). On 2026-11-14 the user expanded publication to all
+12 current article notes. Their front matter was normalized while preserving every note body
+and vault path; templates, drawing sources, plugin scripts, and unreferenced attachments remain excluded.
