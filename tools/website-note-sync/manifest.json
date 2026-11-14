@@ -1,7 +1,7 @@
 {
   "id": "website-note-sync",
   "name": "Website Note Sync",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "minAppVersion": "1.6.0",
   "description": "Manually synchronize public notes between Obsidian and a local Jekyll website, with conflict detection and Border reading styles.",
   "author": "Haoran Liu",

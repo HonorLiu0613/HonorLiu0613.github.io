@@ -218,6 +218,99 @@ function restoreMath(html, math) {
 module.exports={escapeHtml,headingId,protectMath,restoreMath};
 
 },
+'./git-publisher': function(module,exports,require){
+'use strict';
+const fs=require('fs');
+const path=require('path');
+const crypto=require('crypto');
+const {spawn}=require('child_process');
+const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+function defaultExecutable() {
+  const candidate=path.join(process.env.ProgramFiles||'C:/Program Files','Git/cmd/git.exe');
+  return fs.existsSync(candidate)?candidate:'git';
+}
+function redact(text) {
+  return String(text).replace(/(https?:\/\/)[^\s/@]+(?::[^\s/@]+)?@/gi,'$1[credential]@')
+    .replace(/\b(?:gh[pousr]_[a-zA-Z0-9]+|github_pat_[a-zA-Z0-9_]+)\b/g,'[credential]');
+}
+function run(root,args,{executable=defaultExecutable(),allowFailure=false,timeout=120000}={}) {
+  return new Promise((resolve,reject)=>{
+    const child=spawn(executable,args,{cwd:root,windowsHide:true,shell:false,
+      env:{...process.env,GIT_TERMINAL_PROMPT:'0',GCM_INTERACTIVE:'never',
+        GIT_SSH_COMMAND:process.env.GIT_SSH_COMMAND||'ssh -o BatchMode=yes -o ConnectTimeout=15'}});
+    let stdout='',stderr='',timedOut=false;
+    const timer=setTimeout(()=>{timedOut=true;child.kill();},timeout);
+    child.stdout.on('data',data=>{stdout+=data.toString('utf8');});
+    child.stderr.on('data',data=>{stderr+=data.toString('utf8');});
+    child.on('error',error=>{clearTimeout(timer);reject(new Error('无法运行 Git：'+redact(error.message)));});
+    child.on('close',code=>{
+      clearTimeout(timer);
+      if(timedOut)return reject(new Error('Git 操作超时，请检查网络或登录状态后重新预览。'));
+      if(code!==0&&!allowFailure)return reject(new Error(redact((stderr||stdout).trim())||'Git 操作失败，退出码 '+code));
+      resolve({stdout,stderr,code});
+    });
+  });
+}
+function fileDigest(root,relative) {
+  const full=path.resolve(root,relative),rel=path.relative(root,full);
+  if(!rel||rel==='..'||rel.startsWith('..'+path.sep)||path.isAbsolute(rel))throw new Error('无效的网站文件路径。');
+  try {
+    const stat=fs.lstatSync(full);
+    if(stat.isSymbolicLink())return hash('symlink:'+fs.readlinkSync(full));
+    if(!stat.isFile())throw new Error('暂不支持发布此文件类型：'+relative);
+    return hash(fs.readFileSync(full));
+  }catch(error){if(error.code==='ENOENT')return null;throw error;}
+}
+function signature(plan) {
+  return hash(JSON.stringify({root:plan.root,head:plan.head,branch:plan.branch,remote:plan.remote,
+    remoteURL:plan.remoteURL,index:plan.indexHash,status:plan.status,files:plan.files}));
+}
+async function plan(root,settings={}) {
+  root=path.resolve(root);
+  const options={executable:settings.gitExecutable||defaultExecutable()};
+  const git=args=>run(root,args,options);
+  const top=(await git(['rev-parse','--show-toplevel'])).stdout.trim();
+  if(fs.realpathSync(top).toLowerCase()!==fs.realpathSync(root).toLowerCase())throw new Error('网站目录必须是 Git 仓库根目录。');
+  const branch=(await git(['symbolic-ref','--quiet','--short','HEAD'])).stdout.trim();
+  const remote=String(settings.gitRemote||'origin').trim();
+  if(!/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(remote))throw new Error('Git 远程名称无效。');
+  const remoteURL=(await git(['remote','get-url','--push',remote])).stdout.trim();
+  const head=(await git(['rev-parse','HEAD'])).stdout.trim();
+  const status=(await git(['-c','status.renames=false','status','--porcelain=v1','-z','--untracked-files=all'])).stdout;
+  const indexHash=hash((await git(['ls-files','--stage','-z'])).stdout);
+  const files=status.split('\0').filter(Boolean).map(entry=>({status:entry.slice(0,2),path:entry.slice(3)}));
+  if(files.some(file=>/[U]/.test(file.status)||file.status==='AA'||file.status==='DD'))throw new Error('仓库存在未解决的合并冲突，请先处理后再发布。');
+  for(const file of files)file.hash=fileDigest(root,file.path);
+  const tracking='refs/remotes/'+remote+'/'+branch;
+  const exists=await run(root,['show-ref','--verify','--quiet',tracking],{...options,allowFailure:true});
+  const ahead=exists.code===0?Number((await git(['rev-list','--count',tracking+'..HEAD'])).stdout.trim()):null;
+  const behind=exists.code===0?Number((await git(['rev-list','--count','HEAD..'+tracking])).stdout.trim()):null;
+  return {root,branch,remote,remoteURL,head,status,indexHash,files,ahead,behind};
+}
+async function publish(root,settings,expected,message) {
+  const current=await plan(root,settings);
+  if(signature(current)!==signature(expected))throw new Error('预览后仓库内容、暂存区或分支发生变化，请重新预览。');
+  const options={executable:settings.gitExecutable||defaultExecutable()};
+  const git=args=>run(root,args,options);
+  if(current.behind>0)throw new Error('本地记录显示远程有尚未合入的提交，请先拉取并解决差异，再重新同步与发布。');
+  let committed=false,commit=current.head;
+  if(current.files.length) {
+    const body=String(message||'').trim();
+    if(!body)throw new Error('请输入提交说明。');
+    await git(['add','--all','--','.']);
+    await git(['commit','-m',body]);
+    committed=true;commit=(await git(['rev-parse','HEAD'])).stdout.trim();
+  }
+  try {
+    await git(['push','--',current.remote,'HEAD:refs/heads/'+current.branch]);
+  }catch(error){
+    throw new Error((committed?'本地提交 '+commit.slice(0,7)+' 已保留，推送未成功。':'推送未成功。')+'\n'+error.message+'\n可在解决登录、网络或远程分支差异后重新预览并推送。');
+  }
+  return {commit,committed,remote:current.remote,branch:current.branch,files:current.files.length};
+}
+module.exports={defaultExecutable,redact,run,plan,publish,signature};
+
+},
 './main': function(module,exports,require){
 'use strict';
 const {Plugin,PluginSettingTab,Setting,Notice,Modal,MarkdownRenderer,Component,parseYaml,stringifyYaml}=require('obsidian');
@@ -226,7 +319,8 @@ const path=require('path');
 const core=require('./sync-core');
 const border=require('./border-snapshot');
 const render=require('./render-utils');
-const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'bidirectional',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记'};
+const publisher=require('./git-publisher');
+const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'bidirectional',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes'};
 const TODAY=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
 const readDoc=text=>core.parseDocument(text,parseYaml);
 const serialize=doc=>core.serialize(doc,stringifyYaml);
@@ -238,6 +332,8 @@ module.exports=class WebsiteNoteSync extends Plugin {
     this.settings={...DEFAULTS,...this.data.settings};
     this.state=this.data.state||{};
     this.addRibbonIcon('refresh-cw','预览并同步公开笔记',()=>this.preview());
+    this.addRibbonIcon('upload','预览并推送网站',()=>this.previewPush());
+    this.addCommand({id:'push-website',name:'预览改动并推送网站到 GitHub',callback:()=>this.previewPush()});
     this.addCommand({id:'sync-public-notes',name:'预览并同步公开笔记',callback:()=>this.preview()});
     this.addCommand({id:'sync-current-note',name:'预览并同步当前笔记',callback:()=>{
       const file=this.app.workspace.getActiveFile();
@@ -271,6 +367,23 @@ module.exports=class WebsiteNoteSync extends Plugin {
     new Notice('发布属性已补充。写好后勾选 publish，再预览同步。');
   }
   async save() {this.data={...this.data,settings:this.settings,state:this.state};await this.saveData(this.data);}
+  async previewPush() {
+    if(this.running||this.publishing)return new Notice('正在同步或发布，请完成后再试。');
+    try{new PushPreview(this.app,this,await publisher.plan(this.root(),this.settings)).open();}
+    catch(error){new Notice('无法准备发布：'+error.message,12000);console.error(error);}
+  }
+  async pushWebsite(expectedPlan,message) {
+    if(this.running||this.publishing)throw new Error('正在同步或发布。');
+    this.publishing=true;
+    try {
+      const root=this.root();
+      if(this.settings.buildBeforePush)await this.buildWebsite(root);
+      const result=await publisher.publish(root,this.settings,expectedPlan,message);
+      this.data.lastPush={...result,time:new Date().toISOString()};await this.save();
+      new Notice('已推送到 '+result.remote+'/'+result.branch+'；GitHub Actions 正在部署，请稍后查看线上网站。',12000);
+      return result;
+    } finally {this.publishing=false;}
+  }
   root() {
     const root=path.resolve(this.settings.websitePath||'');
     if(!this.settings.websitePath||!fs.existsSync(path.join(root,'_config.yml'))||!fs.existsSync(path.join(root,'_notes')))throw new Error('请在插件设置中选择个人网站仓库目录。');
@@ -337,7 +450,7 @@ module.exports=class WebsiteNoteSync extends Plugin {
     const target=core.inside(root,relative);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,text);
   }
   async synchronize({resolutions={},build=this.settings.buildAfterSync,onlyPath=null,expectedPlan=null}={}) {
-    if(this.running)throw new Error('同步正在进行。');
+    if(this.running||this.publishing)throw new Error('正在同步或发布。');
     this.running=true;
     try {
       const plan=await this.plan({onlyPath});
@@ -557,9 +670,36 @@ class SyncPreview extends Modal {
     const buttonText=this.plan.mode==='web-to-vault'?'导入到 Obsidian':this.plugin.settings.buildAfterSync?'同步并构建本地网站':'同步笔记';
     new Setting(this.contentEl).addButton(button=>button.setButtonText(buttonText).setCta().onClick(async()=>{
       button.setDisabled(true);
-      try{await this.plugin.synchronize({resolutions:this.resolutions,onlyPath:this.plan.onlyPath,expectedPlan:this.plan});this.close();}
+      try{
+        await this.plugin.synchronize({resolutions:this.resolutions,onlyPath:this.plan.onlyPath,expectedPlan:this.plan});this.close();
+        if(this.plan.mode!=='web-to-vault'&&this.plugin.settings.openPushAfterSync)await this.plugin.previewPush();
+      }
       catch(error){new Notice(error.message,10000);console.error(error);button.setDisabled(false);}
     }));
+  }
+  onClose(){this.contentEl.empty();}
+}
+class PushPreview extends Modal {
+  constructor(app,plugin,plan){super(app);this.plugin=plugin;this.plan=plan;this.message=plugin.settings.commitMessage;}
+  onOpen(){
+    this.contentEl.createEl('h2',{text:'发布网站到 GitHub'});
+    this.contentEl.createEl('p',{text:'目标：'+this.plan.remote+' / '+this.plan.branch+' · '+publisher.redact(this.plan.remoteURL)});
+    this.contentEl.createEl('p',{text:'将提交下列全部网站仓库改动（包括已暂存改动），再推送当前分支。忽略目录如 _site 不参与提交。'});
+    if(this.plan.ahead!==null)this.contentEl.createEl('p',{text:'待推送本地提交：'+this.plan.ahead+'；本地记录的远程领先提交：'+this.plan.behind+'。'});
+    if(this.plan.files.length){
+      const list=this.contentEl.createEl('pre');list.style.cssText='max-height:280px;overflow:auto;white-space:pre-wrap;font-size:12px;';
+      list.textContent=this.plan.files.map(file=>file.status+'  '+file.path).join('\n');
+      new Setting(this.contentEl).setName('提交说明').addText(text=>text.setValue(this.message).onChange(value=>{this.message=value;}));
+    }else this.contentEl.createEl('p',{text:'工作区没有待提交文件；会推送现有本地提交。'});
+    const progress=this.contentEl.createEl('p');
+    new Setting(this.contentEl).addButton(button=>button.setButtonText(this.plan.files.length?'提交并推送':'推送现有提交').setCta().onClick(async()=>{
+      button.setDisabled(true);progress.textContent=this.plugin.settings.buildBeforePush?'正在构建、提交并推送…':'正在提交并推送…';
+      try{
+        const result=await this.plugin.pushWebsite(this.plan,this.message);
+        progress.textContent='推送成功：'+result.commit.slice(0,7)+'。线上更新还需等待 GitHub Actions 部署完成。';
+        button.setButtonText('已推送');
+      }catch(error){progress.textContent=error.message;new Notice(error.message,15000);console.error(error);button.setButtonText('关闭后重新预览');}
+    })).addButton(button=>button.setButtonText('关闭').onClick(()=>this.close()));
   }
   onClose(){this.contentEl.empty();}
 }
@@ -582,10 +722,18 @@ class SyncSettings extends PluginSettingTab {
     if(this.plugin.settings.syncMode!=='web-to-vault')new Setting(this.containerEl).setName('同步时刷新正文样式').setDesc('从当前 Obsidian 主题和 Style Settings 更新网站正文 CSS。关闭时保留网站已有正文 CSS。').addToggle(toggle=>toggle.setValue(this.plugin.settings.refreshBodyStyles).onChange(async value=>{this.plugin.settings.refreshBodyStyles=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('Ruby 程序路径').setDesc('用于同步后构建网站；不会自动安装软件。').addText(text=>text.setValue(this.plugin.settings.rubyExecutable).onChange(async value=>{this.plugin.settings.rubyExecutable=value;await this.plugin.save();}));
     if(this.plugin.settings.syncMode!=='web-to-vault')new Setting(this.containerEl).setName('同步后构建本地网站').setDesc('只生成本地预览，不会执行 Git 提交或推送。').addToggle(toggle=>toggle.setValue(this.plugin.settings.buildAfterSync).onChange(async value=>{this.plugin.settings.buildAfterSync=value;await this.plugin.save();}));
+    this.containerEl.createEl('h3',{text:'GitHub 发布'});
+    new Setting(this.containerEl).setName('同步后打开推送预览').setDesc('同步成功后展示网站文件改动，点击“提交并推送”才发布。仅导入模式不会打开。').addToggle(toggle=>toggle.setValue(this.plugin.settings.openPushAfterSync).onChange(async value=>{this.plugin.settings.openPushAfterSync=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('推送前构建检查').setDesc('先构建网站；正文过期或构建失败时停止发布。').addToggle(toggle=>toggle.setValue(this.plugin.settings.buildBeforePush).onChange(async value=>{this.plugin.settings.buildBeforePush=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('Git 程序路径').setDesc('使用本机 Git 已有的 SSH 密钥或凭据管理器，不在插件中保存令牌。').addText(text=>text.setValue(this.plugin.settings.gitExecutable).onChange(async value=>{this.plugin.settings.gitExecutable=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('Git 远程名称').setDesc('默认 origin，推送当前所在分支。').addText(text=>text.setValue(this.plugin.settings.gitRemote).onChange(async value=>{this.plugin.settings.gitRemote=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('默认提交说明').addText(text=>text.setValue(this.plugin.settings.commitMessage).onChange(async value=>{this.plugin.settings.commitMessage=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('手动发布网站').setDesc('也可点击左侧上传图标，或运行“预览改动并推送网站到 GitHub”。').addButton(button=>button.setButtonText('预览改动并推送').onClick(()=>this.plugin.previewPush()));
     this.containerEl.createEl('h3',{text:'新文章与笔记属性'});
     this.containerEl.createEl('p',{text:'在新笔记运行 Templater: Open Insert Template modal，选择 website-note；或使用下方按钮给当前笔记补充属性。写好后勾选 publish，设置 domain 和 tags，再预览同步。'});
     new Setting(this.containerEl).setName('当前笔记发布属性').setDesc('只补充缺失字段，不会将草稿自动公开。').addButton(button=>button.setButtonText('补充属性').onClick(()=>this.plugin.prepareCurrentNote()));
     this.containerEl.createEl('p',{text:'最近同步：'+(this.plugin.data.lastSync?new Date(this.plugin.data.lastSync).toLocaleString():'尚未同步')+'。备份位于插件 backups 文件夹。'});
+    if(this.plugin.data.lastPush)this.containerEl.createEl('p',{text:'最近推送：'+new Date(this.plugin.data.lastPush.time).toLocaleString()+' · '+this.plugin.data.lastPush.commit.slice(0,7)});
   }
 }
 

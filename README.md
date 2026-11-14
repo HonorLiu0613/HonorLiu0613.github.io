@@ -21,7 +21,9 @@ from generated article routes. Public Git history is independent of this flag.
 The desktop plugin is installed in the Obsidian vault. Click its refresh ribbon icon or run
 **Website Note Sync: 预览并同步公开笔记**, review the plan, then synchronize.
 It regenerates native Obsidian article HTML, linked assets, scoped Border styles, and the local
-Jekyll build. It never pushes Git changes. Website-side Markdown edits must be synchronized
+Jekyll build. Version 1.2.0 also provides a Git publication preview: inspect all website changes,
+edit the commit message, then commit and push with the installed Git credentials. Sync opens
+this preview by default; pushing requires clicking its button. Website-side Markdown edits must be synchronized
 before building; a stale-render check prevents publishing cached old article bodies.
 
 Settings provide Obsidian → website, website → Obsidian, and bidirectional modes, with
