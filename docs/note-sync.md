@@ -198,6 +198,24 @@ Obsidian → 设置 → Website Note Sync：
 - Git 程序路径、远程名称：本机 Git，默认远程 `origin`，推送当前分支。
 - 默认提交说明：可设置，发布时也能修改。
 
+## CSDN 与知乎草稿
+
+Website Note Sync 1.3.0 可以把当前打开的 Obsidian 笔记发送到 CSDN 或知乎草稿。它
+不会读取密码或保存 Cookie，也不要求笔记有 `publish: true`；发送内容只有标题、正文和
+图片，网站的 `domain`、`tags`、导航和其他属性不会发送。平台分类由你在各自编辑页处理。
+
+首次使用：
+
+1. 在 Microsoft Edge 的常用个人资料安装 [文章同步助手](https://wechatsync.com/#install)。
+2. 用同一个 Edge 个人资料登录 CSDN 和（或）知乎。
+3. 在 Obsidian 打开笔记，点击左侧纸飞机图标，或运行“将当前笔记发送到 CSDN / 知乎草稿”。
+4. 在插件设置中选择平台；插件会在 Edge 打开发送预览页，检查登录状态后点击“生成所选平台草稿”。
+5. 草稿保存后点击平台编辑页链接，检查排版、图片和公式，再由你点击最终发布。
+
+CSDN 使用 Markdown 并保留 LaTeX；知乎使用 HTML，公式会转换为可上传的 SVG 图片。图片会在
+平台侧上传，单张图片限制 15 MB，本次正文与图片总量限制 40 MB。发送失败或超时不会自动重复，
+请先查看平台草稿箱。它生成的是草稿，插件不会绕过验证码或代替你进行最终公开发布。
+
 每次同步的笔记备份位于：
 `.obsidian/plugins/website-note-sync/backups/<时间>/vault/` 和 `web/`。
 备份保留被改写前的 Markdown，不包含附件历史。恢复时先将所需版本复制回来，再同步。

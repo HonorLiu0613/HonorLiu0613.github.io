@@ -1,9 +1,9 @@
 {
   "id": "website-note-sync",
   "name": "Website Note Sync",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "minAppVersion": "1.6.0",
-  "description": "Manually synchronize public notes between Obsidian and a local Jekyll website, with conflict detection and Border reading styles.",
+  "description": "Sync public notes with a local website, push to GitHub, and send current-note drafts to CSDN or Zhihu through Microsoft Edge and Wechatsync.",
   "author": "Haoran Liu",
   "isDesktopOnly": true
 }

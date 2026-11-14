@@ -320,7 +320,9 @@ const core=require('./sync-core');
 const border=require('./border-snapshot');
 const render=require('./render-utils');
 const publisher=require('./git-publisher');
-const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'bidirectional',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes'};
+const media=require('./media-publisher');
+const mediaContent=require('./media-content');
+const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'bidirectional',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes',edgeExecutable:media.defaultEdge(),mediaPlatforms:['csdn','zhihu'],mediaAutoOpen:true,mediaWebsiteUrl:'https://honorliu.top'};
 const TODAY=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
 const readDoc=text=>core.parseDocument(text,parseYaml);
 const serialize=doc=>core.serialize(doc,stringifyYaml);
@@ -331,8 +333,16 @@ module.exports=class WebsiteNoteSync extends Plugin {
     this.data=await this.loadData()||{};
     this.settings={...DEFAULTS,...this.data.settings};
     this.state=this.data.state||{};
+    this.mediaBridge=new media.MediaBridge(async result=>{
+      this.data.mediaHistory=[result,...(this.data.mediaHistory||[]).filter(item=>item.sourcePath!==result.sourcePath||item.platform!==result.platform)].slice(0,100);
+      await this.save();new Notice((result.platform==='csdn'?'CSDN':'知乎')+' 草稿已保存；请在 Edge 编辑页确认发布。',10000);
+    });
     this.addRibbonIcon('refresh-cw','预览并同步公开笔记',()=>this.preview());
     this.addRibbonIcon('upload','预览并推送网站',()=>this.previewPush());
+    this.addRibbonIcon('send','将当前笔记发送到 CSDN / 知乎草稿',()=>this.previewMedia());
+    this.addCommand({id:'send-current-note-to-media',name:'将当前笔记发送到 CSDN / 知乎草稿',callback:()=>this.previewMedia()});
+    this.addCommand({id:'draft-current-note-csdn',name:'将当前笔记发送到 CSDN 草稿',callback:()=>this.previewMedia(['csdn'])});
+    this.addCommand({id:'draft-current-note-zhihu',name:'将当前笔记发送到知乎草稿',callback:()=>this.previewMedia(['zhihu'])});
     this.addCommand({id:'push-website',name:'预览改动并推送网站到 GitHub',callback:()=>this.previewPush()});
     this.addCommand({id:'sync-public-notes',name:'预览并同步公开笔记',callback:()=>this.preview()});
     this.addCommand({id:'sync-current-note',name:'预览并同步当前笔记',callback:()=>{
@@ -350,6 +360,24 @@ module.exports=class WebsiteNoteSync extends Plugin {
     this.settingTab=new SyncSettings(this.app,this);
     this.addSettingTab(this.settingTab);
   }
+  onunload(){this.mediaBridge?.close();}
+  previewMedia(platforms=this.settings.mediaPlatforms){
+    const file=this.app.workspace.getActiveFile();
+    if(!file||file.extension!=='md')return new Notice('请先打开一篇 Markdown 笔记。');
+    if(file.path.startsWith('99-模板/')||file.path.startsWith('.'))return new Notice('请打开正文笔记后再发送。');
+    new MediaPreview(this.app,this,file,platforms).open();
+  }
+  async sendMedia(file,platforms){
+    if(this.preparingMedia)throw new Error('正在准备另一篇笔记，请稍后再试。');
+    if(!platforms.length)throw new Error('请至少选择一个平台。');
+    this.preparingMedia=true;
+    try{
+      const article=await this.prepareMedia(file);
+      const url=await this.mediaBridge.create(article,{...this.settings,mediaPlatforms:platforms});
+      await media.openEdge(this.settings.edgeExecutable,url);return url;
+    }finally{this.preparingMedia=false;}
+  }
+  async prepareMedia(file){return mediaContent.prepareArticle(this,file);}
   async prepareCurrentNote() {
     const file=this.app.workspace.getActiveFile();
     if(!file||file.extension!=='md')return new Notice('请先打开一篇 Markdown 笔记。');
@@ -670,6 +698,29 @@ module.exports=class WebsiteNoteSync extends Plugin {
   }
 };
 
+class MediaPreview extends Modal {
+  constructor(app,plugin,file,platforms){super(app);this.plugin=plugin;this.file=file;this.platforms=new Set(platforms||[]);}
+  onOpen(){
+    const el=this.contentEl;el.createEl('h2',{text:'发送到媒体草稿'});
+    el.createEl('p',{text:this.file.basename});
+    el.createEl('p',{text:'发送当前笔记的标题、正文和图片，无需 publish 属性，也不带网站分类。下一步在 Edge 检查登录和正文，再生成草稿；最终发布由你确认。'});
+    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎']])new Setting(el).setName(name).addToggle(toggle=>toggle.setValue(this.platforms.has(type)).onChange(value=>{if(value)this.platforms.add(type);else this.platforms.delete(type);}));
+    const history=(this.plugin.data.mediaHistory||[]).filter(item=>item.sourcePath===this.file.path);
+    if(history.length){
+      el.createEl('p',{text:'这篇笔记已有草稿记录。再次发送会新建草稿；修改已有草稿请打开下方编辑页。'});
+      for(const item of history)new Setting(el).setName((item.platform==='csdn'?'CSDN':'知乎')+' · '+new Date(item.time).toLocaleString()).addButton(button=>button.setButtonText('打开已有草稿').onClick(async()=>{try{await media.openEdge(this.plugin.settings.edgeExecutable,item.url);}catch(error){new Notice(error.message);}}));
+    }
+    el.createEl('p',{text:'首次使用请在常用 Edge 中安装“文章同步助手”，并登录所选平台。CSDN 保留 LaTeX；知乎公式转成图片。两平台使用自己的正文排版。'});
+    const status=el.createEl('p');
+    new Setting(el).addButton(button=>button.setButtonText('在 Edge 检查并发送').setCta().onClick(async()=>{
+      button.setDisabled(true);status.textContent='正在准备正文和图片…';
+      try{await this.plugin.sendMedia(this.file,[...this.platforms]);this.close();new Notice('已在 Edge 打开发送页面，请检查内容后生成草稿。',10000);}
+      catch(error){status.textContent=error.message;button.setDisabled(false);console.error(error);}
+    }));
+  }
+  onClose(){this.contentEl.empty();}
+}
+
 class SyncPreview extends Modal {
   constructor(app,plugin,plan){super(app);this.plugin=plugin;this.plan=plan;this.resolutions={};}
   onOpen(){
@@ -763,6 +814,14 @@ class SyncSettings extends PluginSettingTab {
     new Setting(this.containerEl).setName('Git 远程名称').setDesc('默认 origin，推送当前所在分支。').addText(text=>text.setValue(this.plugin.settings.gitRemote).onChange(async value=>{this.plugin.settings.gitRemote=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('默认提交说明').addText(text=>text.setValue(this.plugin.settings.commitMessage).onChange(async value=>{this.plugin.settings.commitMessage=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('手动发布网站').setDesc('也可点击左侧上传图标，或运行“预览改动并推送网站到 GitHub”。').addButton(button=>button.setButtonText('预览改动并推送').onClick(()=>this.plugin.previewPush()));
+    this.containerEl.createEl('h3',{text:'CSDN / 知乎草稿'});
+    this.containerEl.createEl('p',{text:'通过 Edge 的“文章同步助手”扩展保存草稿；只发送当前笔记，不依赖网站同步方向或公开属性。公开发布请在平台编辑页确认。'});
+    this.containerEl.createEl('a',{text:'安装 / 更新文章同步助手',href:'https://wechatsync.com/#install'});
+    new Setting(this.containerEl).setName('Microsoft Edge 程序路径').setDesc('使用平时登录平台的 Edge 个人资料。插件不读取或保存密码、Cookie。').addText(text=>text.setValue(this.plugin.settings.edgeExecutable).onChange(async value=>{this.plugin.settings.edgeExecutable=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('个人网站公开网址').setDesc('将笔记中的公开内部链接转换成完整网址；私有笔记链接仅保留文字。').addText(text=>text.setValue(this.plugin.settings.mediaWebsiteUrl).onChange(async value=>{this.plugin.settings.mediaWebsiteUrl=value;await this.plugin.save();}));
+    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎']])new Setting(this.containerEl).setName('默认选择 '+name).addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaPlatforms.includes(type)).onChange(async value=>{const selected=new Set(this.plugin.settings.mediaPlatforms);if(value)selected.add(type);else selected.delete(type);this.plugin.settings.mediaPlatforms=[...selected];await this.plugin.save();}));
+    new Setting(this.containerEl).setName('保存草稿后打开编辑页').setDesc('Edge 拦截弹出窗口时，点击结果中的“打开编辑页并确认发布”。').addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaAutoOpen).onChange(async value=>{this.plugin.settings.mediaAutoOpen=value;await this.plugin.save();}));
+    new Setting(this.containerEl).setName('发送当前笔记').setDesc('也可以点击左侧纸飞机图标，或运行“将当前笔记发送到 CSDN / 知乎草稿”。').addButton(button=>button.setButtonText('选择平台并预览').onClick(()=>this.plugin.previewMedia()));
     this.containerEl.createEl('h3',{text:'新文章与笔记属性'});
     this.containerEl.createEl('p',{text:'在新笔记运行 Templater: Open Insert Template modal，选择 website-note；或使用下方按钮给当前笔记补充属性。写好后勾选 publish，设置 domain 和 tags，再预览同步。'});
     new Setting(this.containerEl).setName('当前笔记发布属性').setDesc('只补充缺失字段，不会将草稿自动公开。').addButton(button=>button.setButtonText('补充属性').onClick(()=>this.plugin.prepareCurrentNote()));
@@ -770,6 +829,309 @@ class SyncSettings extends PluginSettingTab {
     if(this.plugin.data.lastPush)this.containerEl.createEl('p',{text:'最近推送：'+new Date(this.plugin.data.lastPush.time).toLocaleString()+' · '+this.plugin.data.lastPush.commit.slice(0,7)});
   }
 }
+
+},
+'./media-content': function(module,exports,require){
+'use strict';
+const fs=require('fs'),path=require('path'),os=require('os');
+const core=require('./sync-core');
+const MIME={'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.gif':'image/gif','.webp':'image/webp','.svg':'image/svg+xml','.avif':'image/avif'};
+
+function escapeMarkdown(value){return value.replace(/([\\`*_[\]<>])/g,'\\$1');}
+// Derive Markdown from the same rendered tree used for HTML, so embeds and links agree.
+function markdown(node){
+  if(node.nodeType===3)return escapeMarkdown(node.nodeValue);
+  if(node.nodeType!==1)return '';
+  const tag=node.tagName.toLowerCase(),children=()=>[...node.childNodes].map(markdown).join('');
+  if(node.classList.contains('math-inline')||node.classList.contains('math-display')){
+    const text=node.textContent,display=node.classList.contains('math-display');
+    const formula=text.slice(2,-2);return display?'\n\n$$\n'+formula+'\n$$\n\n':'$'+formula+'$';
+  }
+  if(tag==='pre'){
+    const code=node.querySelector('code')||node,lang=(code.className.match(/language-([\w+-]+)/)||[])[1]||'';
+    const text=code.textContent,fence='`'.repeat(Math.max(3,...[...text.matchAll(/`+/g)].map(m=>m[0].length+1)));
+    return '\n\n'+fence+lang+'\n'+text.replace(/\n$/,'')+'\n'+fence+'\n\n';
+  }
+  if(tag==='code'){const text=node.textContent,tick='`'.repeat(Math.max(1,...[...text.matchAll(/`+/g)].map(m=>m[0].length+1)));return tick+' '+text+' '+tick;}
+  if(/^h[1-6]$/.test(tag))return '\n\n'+'#'.repeat(Number(tag[1]))+' '+children()+'\n\n';
+  if(tag==='img')return '!['+escapeMarkdown(node.getAttribute('alt')||'')+']('+node.getAttribute('src')+')';
+  if(tag==='a')return '['+children()+']('+node.getAttribute('href')+')';
+  if(tag==='strong'||tag==='b')return '**'+children()+'**';
+  if(tag==='em'||tag==='i')return '*'+children()+'*';
+  if(tag==='del'||tag==='s')return '~~'+children()+'~~';
+  if(tag==='br')return '  \n';
+  if(tag==='hr')return '\n\n---\n\n';
+  if(tag==='blockquote')return '\n\n'+children().trim().split('\n').map(line=>'> '+line).join('\n')+'\n\n';
+  if(tag==='ul'||tag==='ol'){
+    return '\n\n'+[...node.children].filter(n=>n.tagName==='LI').map((li,i)=>{
+      const prefix=tag==='ol'?(i+1)+'. ':'- ',text=[...li.childNodes].map(markdown).join('').trim();
+      return prefix+text.replace(/\n/g,'\n'+' '.repeat(prefix.length));
+    }).join('\n')+'\n\n';
+  }
+  if(tag==='table'){
+    const rows=[...node.querySelectorAll('tr')].map(tr=>[...tr.children].map(cell=>[...cell.childNodes].map(markdown).join('').trim().replace(/\|/g,'\\|').replace(/\n+/g,'<br>')));
+    if(!rows.length)return '';
+    const width=Math.max(...rows.map(row=>row.length)),line=row=>'| '+Array.from({length:width},(_,i)=>row[i]||'').join(' | ')+' |';
+    return '\n\n'+[line(rows[0]),line(Array(width).fill('---')),...rows.slice(1).map(line)].join('\n')+'\n\n';
+  }
+  const content=children();return ['p','div','section','figure'].includes(tag)?'\n\n'+content.trim()+'\n\n':content;
+}
+
+async function formulaImage(latex,display){
+  // Use a deterministic SVG so it works across Obsidian versions. The source
+  // stays in the image alt text and can be edited on the platform.
+  const escaped=String(latex).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const width=Math.min(1800,Math.max(240,escaped.length*12+32)),height=display?64:42;
+  const svgText=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="white"/><text x="16" y="${display?42:28}" font-family="serif" font-size="${display?24:19}" fill="black">${escaped}</text></svg>`;
+  return 'data:image/svg+xml;base64,'+Buffer.from(svgText).toString('base64');
+}
+
+async function prepareArticle(plugin,file){
+  const {parseYaml}=require('obsidian'),doc=core.parseDocument(await plugin.app.vault.read(file),parseYaml);
+  if(!doc.body.trim())throw new Error('当前笔记没有正文。');
+  const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'obsidian-media-'));
+  try{
+    const routes=new Map();
+    for(const note of plugin.app.vault.getMarkdownFiles()){
+      const metadata=plugin.app.metadataCache.getFileCache(note)?.frontmatter;
+      if(metadata?.publish===true&&metadata.web_slug)routes.set(note.path,'/notes/'+core.safeSlug(metadata.web_slug)+'/');
+    }
+    const rendered=await plugin.renderNote({file,doc,slug:'media-preview',title:file.basename},temporary,routes);
+    const root=document.createElement('div');root.innerHTML=rendered.html;
+    const site=String(plugin.settings.mediaWebsiteUrl||'https://honorliu.top').replace(/\/$/,'');
+    if(!/^https?:\/\//.test(site))throw new Error('请在设置里填写有效的网站公开网址。');
+    // Only the article tree is sent. Remove active content, style rules and form controls.
+    root.querySelectorAll('script,style,iframe,object,embed,form,input,button,textarea,select,link,meta').forEach(n=>n.remove());
+    if(root.querySelector('video,audio,source'))throw new Error('媒体草稿暂不支持音视频；请改为公开链接后重试。');
+    if(root.querySelector('canvas'))throw new Error('笔记有图表或 Canvas，请先转换为 PNG 图片后发送。');
+    // Obsidian may emit SVG for a formula. Those are replaced with the portable
+    // formula SVG below; other diagrams are intentionally rejected.
+    for(const svg of [...root.querySelectorAll('svg')])if(!svg.closest('.math-inline,.math-display'))throw new Error('笔记有 SVG 图表，请先转换为 PNG 图片后发送。');
+    for(const node of root.querySelectorAll('*'))for(const attr of [...node.attributes]){
+      if(/^on/i.test(attr.name)||['style','srcset','id'].includes(attr.name))node.removeAttribute(attr.name);
+    }
+    for(const image of root.querySelectorAll('img')){
+      const src=image.getAttribute('src')||'';
+      if(src.startsWith('/assets/notes/')){
+        const local=core.inside(temporary,src.slice(1)),mime=MIME[path.extname(local).toLowerCase()];
+        if(!mime)throw new Error('此图片格式不受支持：'+src);
+        const bytes=fs.readFileSync(local);if(bytes.length>15*1024*1024)throw new Error('单张图片超过 15 MB，请先压缩。');
+        image.setAttribute('src','data:'+mime+';base64,'+bytes.toString('base64'));
+      }else if(src.startsWith('/'))image.setAttribute('src',new URL(src,site).href);
+      else if(!/^(https?:\/\/|data:image\/(png|jpeg|gif|webp|svg\+xml|avif);base64,)/i.test(src))throw new Error('图片地址无效。');
+    }
+    for(const link of root.querySelectorAll('a')){
+      const href=link.getAttribute('href')||'';
+      if(href.startsWith('/'))link.setAttribute('href',new URL(href,site).href);
+      else if(!/^(https?:\/\/|mailto:|tel:|#)/i.test(href))link.replaceWith(document.createTextNode(link.textContent));
+      // PDFs and other local files cannot be uploaded by the image integration.
+      if(href.startsWith('/assets/notes/'))throw new Error('正文包含本地附件链接；请改成已公开的文件网址后重试。');
+    }
+    const markdownBody=[...root.childNodes].map(markdown).join('').trim();
+    const csdn=root.innerHTML,zhihu=root.cloneNode(true);
+    for(const math of zhihu.querySelectorAll('.math-inline,.math-display')){
+      const display=math.classList.contains('math-display'),latex=math.textContent.slice(2,-2);
+      const image=document.createElement('img');image.src=await formulaImage(latex,display);image.alt=latex;
+      if(display){const paragraph=document.createElement('p');paragraph.append(image);math.replaceWith(paragraph);}else math.replaceWith(image);
+    }
+    const article={title:String(doc.meta.title||file.basename),sourcePath:file.path,fingerprint:core.hash(doc.body),
+      posts:{csdn:{title:String(doc.meta.title||file.basename),content:csdn,markdown:markdownBody},zhihu:{title:String(doc.meta.title||file.basename),content:zhihu.innerHTML}},
+      images:root.querySelectorAll('img').length,formulas:(rendered.html.match(/class="math-(?:inline|display)"/g)||[]).length};
+    if(Buffer.byteLength(JSON.stringify(article))>40*1024*1024)throw new Error('本次正文和图片超过 40 MB，请拆分笔记或压缩图片。');
+    return article;
+  }finally{fs.rmSync(temporary,{recursive:true,force:true});}
+}
+module.exports={prepareArticle,markdown,formulaImage};
+
+},
+'./media-page': function(module,exports,require){
+'use strict';
+const {escapeHtml}=require('./render-utils');
+
+// Runs inside the user's normal Edge profile, where the extension and logins live.
+function browserMain(payload){
+  const names={csdn:'CSDN',zhihu:'知乎'},status=document.querySelector('#status'),send=document.querySelector('#send'),refresh=document.querySelector('#refresh');
+  let accounts=[],busy=false,expired=false,checking=false;
+  const saved=new Set(Object.keys(payload.results||{})),inFlight=new Set();
+  const text=(id,value)=>{document.querySelector('#'+id).textContent=value;};
+  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const sdk=()=>window.$syncer||window.$poster;
+  const safeUrl=(type,value)=>{
+    try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(type==='csdn'?url.hostname==='editor.csdn.net':url.hostname==='zhuanlan.zhihu.com')?url.href:null;}catch{return null;}
+  };
+  // Both old and new SDK callbacks deliver their result as the first argument.
+  function call(method,arg,timeout=60000){return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error('扩展响应超时，请检查扩展权限与平台登录状态。')),timeout);
+    const callback=(first,second)=>{clearTimeout(timer);const result=second===undefined?first:second;if(result?.error)reject(new Error(result.error));else resolve(result);};
+    try{if(arg===undefined)sdk()[method](callback);else sdk()[method](arg,callback);}catch(error){clearTimeout(timer);reject(error);}
+  });}
+  async function check(){
+    if(checking||busy||expired)return;checking=true;refresh.disabled=true;send.disabled=true;status.textContent='正在检测扩展和登录状态…';
+    try{
+      for(let i=0;i<30&&!sdk();i++)await sleep(200);
+      if(!sdk()?.getAccounts||!sdk()?.addTask||!sdk()?.uploadImage)throw new Error('未检测到兼容的“文章同步助手”。请在当前 Edge 个人资料中安装扩展，并允许它访问此本机网页，然后刷新页面。');
+      const response=await call('getAccounts');accounts=Array.isArray(response)?response:response?.accounts||[];
+      for(const type of Object.keys(names)){
+        const account=accounts.find(a=>a.type===type),input=document.querySelector('#'+type);
+        input.disabled=!account||saved.has(type)||inFlight.has(type);
+        text(type+'-account',account?'已登录：'+account.title:'未登录，请先在同一 Edge 个人资料中登录');
+      }
+      status.textContent='已完成检测。勾选平台后，点击“生成所选平台草稿”。';send.disabled=!accounts.some(a=>names[a.type]);
+    }catch(error){status.textContent=error.message;}
+    finally{checking=false;refresh.disabled=false;}
+  }
+  async function uploadImages(post,account){
+    const copy={...post},tree=document.createElement('div');tree.innerHTML=copy.content;
+    const sources=[...new Set([...tree.querySelectorAll('img')].map(img=>img.getAttribute('src')).filter(Boolean))];
+    for(let i=0;i<sources.length;i++){
+      const source=sources[i];text(account.type+'-progress','上传图片 '+(i+1)+' / '+sources.length);
+      const result=await call('uploadImage',{src:source,account},120000),url=result?.result?.url||result?.url;
+      if(!/^https:\/\//i.test(url||''))throw new Error('图片上传没有返回有效地址，已停止创建草稿。');
+      for(const image of tree.querySelectorAll('img'))if(image.getAttribute('src')===source)image.setAttribute('src',url);
+      if(copy.markdown)copy.markdown=copy.markdown.split(source).join(url);
+    }
+    copy.content=tree.innerHTML;return copy;
+  }
+  function createDraft(post,account){return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error('草稿保存超时；平台可能已收到内容。请先到草稿箱检查，再决定是否重试。')),240000);
+    const handler=task=>{
+      const item=task?.accounts?.find(a=>a.type===account.type);if(!item)return;
+      text(account.type+'-progress',item.msg||'正在保存草稿…');
+      if(item.status==='failed'){clearTimeout(timer);reject(new Error(item.error||'平台保存失败，请检查登录或验证要求。'));}
+      if(item.status==='done'){
+        clearTimeout(timer);const url=safeUrl(account.type,item.editResp?.draftLink);
+        if(url)resolve(url);else reject(new Error('扩展报告完成，但没有返回可信的编辑页链接。请先检查平台草稿箱。'));
+      }
+    };
+    try{sdk().addTask({post,accounts:[account]},handler,error=>{if(error?.error){clearTimeout(timer);reject(new Error(error.error));}});}catch(error){clearTimeout(timer);reject(error);}
+  });}
+  send.addEventListener('click',async()=>{
+    if(busy||expired)return;
+    const selected=Object.keys(names).filter(type=>document.querySelector('#'+type).checked&&!saved.has(type)&&!inFlight.has(type));
+    if(!selected.length){status.textContent='请至少选择一个已登录的平台。';return;}
+    busy=true;send.disabled=true;refresh.disabled=true;
+    document.querySelectorAll('input[type=checkbox]').forEach(input=>input.disabled=true);
+    let successes=0;
+    for(const type of selected){
+      const account=accounts.find(a=>a.type===type);if(!account)continue;
+      try{
+        status.textContent='正在生成 '+names[type]+' 草稿，请保持本页打开…';
+        const post=await uploadImages(payload.article.posts[type],account);
+        inFlight.add(type);
+        const url=await createDraft(post,account);saved.add(type);inFlight.delete(type);successes++;
+        const result=document.querySelector('#'+type+'-result');result.replaceChildren();
+        const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='打开编辑页并确认发布';result.append(link);
+        text(type+'-progress','草稿已保存，尚未公开发布');
+        try{
+          const response=await fetch('result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:type,url})});
+          if(!response.ok)throw new Error('记录失败');
+        }catch{result.append(document.createTextNode('（Obsidian 记录未保存，请保留此链接）'));}
+        if(payload.autoOpen)window.open(url,'_blank','noopener,noreferrer');
+      }catch(error){text(type+'-progress',error.message);}
+    }
+    busy=false;refresh.disabled=false;
+    for(const type of Object.keys(names)){const input=document.querySelector('#'+type);input.disabled=saved.has(type)||inFlight.has(type)||!accounts.some(a=>a.type===type);if(saved.has(type)||inFlight.has(type))input.checked=false;}
+    send.disabled=false;
+    status.textContent='本次完成 '+successes+' 个草稿。请在各平台编辑页检查图片、公式和正文后确认发布。'+(inFlight.size?' 有平台结果不明确：先检查草稿箱；此页已阻止重复发送。':'');
+  });
+  refresh.addEventListener('click',check);
+  document.querySelector('#article-title').textContent=payload.article.title;
+  // Content was sanitized in Obsidian; it remains local until the user clicks send.
+  document.querySelector('#preview').innerHTML=payload.article.posts.zhihu.content;
+  for(const type of Object.keys(names)){
+    document.querySelector('#'+type).checked=payload.platforms.includes(type)&&!saved.has(type);
+    const url=safeUrl(type,payload.results?.[type]);
+    if(url){
+      const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='打开编辑页并确认发布';document.querySelector('#'+type+'-result').append(link);
+      text(type+'-progress','草稿已保存，尚未公开发布');
+    }
+  }
+  check();
+  setTimeout(()=>{
+    expired=true;send.disabled=true;refresh.disabled=true;
+    status.textContent='本次发送窗口已过期，请从 Obsidian 重新打开。已有的草稿链接仍可使用。';
+    payload.article.posts={};document.querySelector('#preview').replaceChildren();
+  },payload.ttl);
+}
+
+function page(payload,nonce){
+  const json=JSON.stringify(payload).replace(/</g,'\\u003c');
+  return `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>发送笔记草稿</title>
+  <style>body{margin:0;background:#f4f6fa;color:#202c3c;font:16px/1.65 system-ui,"Microsoft YaHei",sans-serif}main{max-width:960px;margin:32px auto;padding:28px;background:white;border:1px solid #dce3ec;border-radius:16px}h1{font-size:26px;margin:0 0 8px}h2{font-size:21px}p{margin:8px 0 16px}.hint{color:#536174}.platform{padding:16px;border:1px solid #dce3ec;border-radius:10px;margin:12px 0}.platform label{font-size:18px;font-weight:600}.account,.progress{display:block;margin-top:6px;overflow-wrap:anywhere}.account{color:#536174;font-size:14px}button{padding:11px 18px;font:inherit;border:1px solid #b9c9e4;border-radius:8px;cursor:pointer;background:#eff4fc;color:#173a75;margin:8px 8px 8px 0}button.primary{background:#245dc1;color:white}button:disabled{opacity:.55;cursor:default}a{color:#1852ad}#status{padding:14px;background:#edf3fc;border-radius:8px}#preview{padding:20px;border:1px solid #dce3ec;overflow-wrap:anywhere}#preview img{max-width:100%;height:auto;vertical-align:middle}#preview pre{overflow:auto;background:#f3f5f8;padding:14px}#preview table{border-collapse:collapse}#preview td,#preview th{border:1px solid #ccd4df;padding:6px 10px}@media(max-width:640px){main{margin:0;padding:18px;border-radius:0}}</style>
+  <main><h1>发送笔记草稿</h1><p class="hint">使用当前 Edge 个人资料的登录状态。仅发送标题、正文和图片；网站分类与笔记属性不会发送。最终公开发布由你在平台确认。</p>
+  <p><a href="https://wechatsync.com/#install" target="_blank" rel="noopener noreferrer">安装 / 更新文章同步助手</a> · <a href="https://editor.csdn.net/md/" target="_blank" rel="noopener noreferrer">登录 CSDN</a> · <a href="https://www.zhihu.com/" target="_blank" rel="noopener noreferrer">登录知乎</a></p>
+  <div id="status" role="status" aria-live="polite">正在准备…</div>
+  ${['csdn','zhihu'].map(type=>`<div class="platform"><label><input type="checkbox" id="${type}" disabled> ${type==='csdn'?'CSDN':'知乎'}</label><span id="${type}-account" class="account"></span><span id="${type}-progress" class="progress" aria-live="polite"></span><div id="${type}-result"></div></div>`).join('')}
+  <button id="refresh">重新检测登录</button><button id="send" class="primary" disabled>生成所选平台草稿</button>
+  <p class="hint">图片会逐张上传，失败时停止该平台的草稿创建。每次发送会新建草稿；结果超时请先检查草稿箱。CSDN 保留 LaTeX，知乎公式以图片显示。平台排版以编辑页为准。</p>
+  <h2 id="article-title">${escapeHtml(payload.article.title)}</h2><details open><summary>发送内容预览（本机）</summary><article id="preview"></article></details></main>
+  <script nonce="${nonce}">(${browserMain.toString()})(${json});</script></html>`;
+}
+module.exports={page,browserMain};
+
+},
+'./media-publisher': function(module,exports,require){
+'use strict';
+const fs=require('fs'),path=require('path'),http=require('http'),crypto=require('crypto');
+const {spawn}=require('child_process');
+const {page}=require('./media-page');
+const TTL=60*60*1000;
+function defaultEdge(){
+  return [process.env['PROGRAMFILES(X86)'],process.env.PROGRAMFILES,process.env.LOCALAPPDATA].filter(Boolean).map(base=>path.join(base,'Microsoft','Edge','Application','msedge.exe')).find(file=>fs.existsSync(file))||'';
+}
+function openEdge(executable,url){
+  if(!executable||!fs.existsSync(executable))throw new Error('未找到 Microsoft Edge，请在插件设置中填写 Edge 程序路径。');
+  return new Promise((resolve,reject)=>{
+    const child=spawn(executable,[url],{detached:true,stdio:'ignore',windowsHide:true});
+    child.once('error',reject);child.once('spawn',()=>{child.unref();resolve();});
+  });
+}
+function draftUrl(platform,value){
+  try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(platform==='csdn'?url.hostname==='editor.csdn.net':platform==='zhihu'&&url.hostname==='zhuanlan.zhihu.com')?url.href:null;}catch{return null;}
+}
+class MediaBridge{
+  constructor(onResult){this.sessions=new Map();this.onResult=onResult;}
+  async start(){
+    if(this.server)return;
+    const server=http.createServer((req,res)=>this.handle(req,res).catch(()=>{if(!res.headersSent)res.writeHead(500);res.end('Local handoff failed');}));
+    server.requestTimeout=15000;server.headersTimeout=10000;
+    await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
+    this.server=server;this.origin='http://127.0.0.1:'+server.address().port;
+    this.timer=setInterval(()=>{for(const [token,s]of this.sessions)if(s.expires<Date.now())this.sessions.delete(token);},60000);this.timer.unref?.();
+  }
+  async create(article,settings){
+    await this.start();
+    if(this.sessions.size>=8)throw new Error('已有多个发送窗口，请关闭后重新启用插件再试。');
+    const token=crypto.randomBytes(24).toString('hex');
+    this.sessions.set(token,{article,platforms:['csdn','zhihu'].filter(type=>settings.mediaPlatforms?.includes(type)),autoOpen:settings.mediaAutoOpen!==false,expires:Date.now()+TTL,results:{}});
+    return this.origin+'/'+token+'/';
+  }
+  async handle(req,res){
+    res.setHeader('Cache-Control','no-store');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');
+    if(req.headers.host!==new URL(this.origin).host){res.writeHead(403);res.end();return;}
+    const match=/^\/([a-f0-9]{48})\/(result)?$/.exec(req.url),session=match&&this.sessions.get(match[1]);
+    if(!session||session.expires<Date.now()){res.writeHead(410);res.end('Session expired. Open it again from Obsidian.');return;}
+    if(req.method==='GET'&&!match[2]){
+      const nonce=crypto.randomBytes(16).toString('base64');
+      res.setHeader('Content-Type','text/html; charset=utf-8');
+      res.setHeader('Content-Security-Policy',`default-src 'none'; script-src 'nonce-${nonce}' chrome-extension:; style-src 'unsafe-inline'; img-src data: https:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'`);
+      res.end(page({article:session.article,platforms:session.platforms,autoOpen:session.autoOpen,results:session.results,ttl:session.expires-Date.now()},nonce));return;
+    }
+    if(req.method==='POST'&&match[2]&&req.headers.origin===this.origin&&req.headers['content-type']==='application/json'){
+      let body='';for await(const chunk of req){body+=chunk;if(body.length>8192){res.writeHead(413);res.end();return;}}
+      let result;try{result=JSON.parse(body);}catch{res.writeHead(400);res.end();return;}
+      const url=draftUrl(result.platform,result.url);if(!url){res.writeHead(400);res.end();return;}
+      if(!session.results[result.platform]){
+        await this.onResult({sourcePath:session.article.sourcePath,title:session.article.title,fingerprint:session.article.fingerprint,platform:result.platform,url,time:new Date().toISOString()});
+        session.results[result.platform]=url;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});res.end('{"saved":true}');return;
+    }
+    res.writeHead(403);res.end();
+  }
+  close(){clearInterval(this.timer);this.sessions.clear();this.server?.close();this.server?.closeAllConnections();this.server=null;}
+}
+module.exports={MediaBridge,defaultEdge,openEdge,draftUrl};
 
 },
 };
