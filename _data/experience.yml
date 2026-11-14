@@ -1,0 +1,23 @@
+# Only dates and details documented in the existing site are included.
+- period: "2026"
+  kind: Project
+  title: 暖灶记 · WeChat Family Menu
+  description: A family meal-planning mini program, from shared recipe collections to collaborative ordering.
+  url: /notes/wechat-family-menu/
+  date: 2026-10-23
+- period: "2026"
+  kind: Project
+  title: Personal Website
+  description: A personal home for learning notes and projects, built with Jekyll and GitHub Pages.
+  url: /notes/personal-website/
+  date: 2026-08-01
+- period: "2023–2025"
+  kind: Competition
+  title: Robotics & Information Security Competitions
+  description: Experiences with RoboCup China, robot developer contests, and information security competitions.
+  url: /experience/robotics-competitions/
+  date: 2025-12-01
+- period: Education
+  kind: Education
+  title: Northeast Electric Power University
+  description: Robot Engineering. Interests include robotics, control systems, and embedded development.

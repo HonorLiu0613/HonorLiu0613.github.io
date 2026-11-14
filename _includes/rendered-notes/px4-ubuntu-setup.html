@@ -1,0 +1,55 @@
+<h2 data-heading="一句话理解" dir="auto" id="一句话理解">一句话理解</h2>
+<h2 data-heading="什么是PX4" dir="auto" id="什么是px4">什么是PX4</h2>
+<p dir="auto"><em>PX4</em> 是一款专业级飞控。 它由来自业界和学术界的世界级开发商开发，并得到活跃的全球社区的支持，为从竞速和物流无人机到地面车辆和潜水艇的各种载具提供动力。</p>
+<h2 data-heading="架构介绍" dir="auto" id="架构介绍">架构介绍</h2>
+<p dir="auto"><img width="633" alt="PX4 architecture - FC only system" src="https://docs.px4.io/v1.17/assets/px4_arch_fc.C3B09NE9.svg" referrerpolicy="no-referrer"></p>
+<ul>
+<li dir="auto">
+<p>PX4架构使用<code>UORB总线</code>进行内部的通信。</p>
+</li>
+<li dir="auto">
+<p>使用<code>MAVLink</code>与<code>QGC</code>地面站进行通信。</p>
+</li>
+<li dir="auto">
+<p>使用<code>uXRCE-DDS</code>通过桥接内部的话题与ROS2通信。</p>
+</li>
+<li dir="auto">
+<p><em>相关笔记：</em>  <a href="/notes/micro-xrce-dds-bridge/" class="internal-link" target="_blank" rel="noopener nofollow">2. 桥接器 uXRCE-DDS中间件</a></p>
+</li>
+</ul>
+<h2 data-heading="控制架构" dir="auto" id="控制架构">控制架构</h2>
+<p dir="auto"><span class="internal-embed media-embed image-embed is-loaded"><img alt="Pasted image 20261114161356.png" src="/assets/notes/px4-ubuntu-setup/c8fbb5ff6c-pasted-image-20261114161356.png"></span></p>
+<p dir="auto">这些估计数据来源于 EKF2。</p>
+<h2 data-heading="1.克隆PX4源码" dir="auto" id="1克隆px4源码">1.克隆PX4源码</h2>
+<pre class="language-sh"><code class="language-sh is-loaded"><span class="token function">git</span> clone https://github.com/PX4/PX4-Autopilot.git <span class="token parameter variable">--recursive</span>
+</code></pre>
+<p dir="auto">`<br>
+<strong>INFO</strong><br>
+源代码中的环境配置脚本通常适用于最新的 PX4 版本。如果你使用的是较旧版本的 PX4，那么可能需要获取针对特定版本的源代码。</p>
+<p dir="auto">在 bash shell 中，无需提供任何参数即可运行 ubuntu.sh 脚本，以完成所有安装操作：</p>
+<pre class="language-bash"><code class="language-bash is-loaded"><span class="token function">bash</span> ./PX4-Autopilot/Tools/setup/ubuntu.sh
+</code></pre>
+<ul>
+<li dir="auto">在安装过程中确认并通过所有的提示。</li>
+<li dir="auto">You can use the <code>--no-nuttx</code> and <code>--no-sim-tools</code> options to omit the NuttX and/or simulation tools.<br>
+你可以使用 <code>--no-nuttx</code> 和 <code>--no-sim-tools</code> 选项来跳过 NuttX 和/或仿真工具的使用。</li>
+</ul>
+<h2 data-heading="2.下载 QGroundControl" dir="auto" id="2下载-qgroundcontrol">2.下载 QGroundControl</h2>
+<p dir="auto">官方推荐使用 <strong>AppImage</strong>：</p>
+<ul>
+<li dir="auto">GitHub Releases：<br>
+<a rel="noopener nofollow" class="external-link" href="https://github.com/mavlink/qgroundcontrol/releases" target="_blank">https://github.com/mavlink/qgroundcontrol/releases</a></li>
+<li dir="auto">下载文件名通常为：<br>
+<strong>QGroundControl-x86_64.AppImage</strong> 或 <strong>QGroundControl.AppImage</strong><br>
+<strong>请选择与你版本适配的版本</strong></li>
+</ul>
+<h2 data-heading="3.构建代码" dir="auto" id="3构建代码">3.构建代码</h2>
+<ul>
+<li dir="auto">请注意<code>PX4-Gazebo</code>环境要求必须开着<code>QGC</code>才可以运行</li>
+</ul>
+<pre class="language-bash"><code class="language-bash is-loaded"><span class="token function">make</span> px4_sitl gz_x500
+</code></pre>
+<h2 data-heading="相关知识" dir="auto" id="相关知识">相关知识</h2>
+<ul>
+<li dir="auto"><a data-tooltip-position="top" aria-label="https://docs.px4.io/v1.17/zh" rel="noopener nofollow" class="external-link" href="https://docs.px4.io/v1.17/zh" target="_blank">PX4中文手册</a></li>
+</ul>

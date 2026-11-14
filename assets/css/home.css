@@ -1,0 +1,240 @@
+/* Original homepage appearance; loaded on Home only. */
+/* ==========================================================================
+   HOMEPAGE HERO SECTION
+   Custom styles for the homepage hero card and sections
+   ========================================================================== */
+
+/* Subtle light blue gradient background */
+body {
+  background: linear-gradient(160deg, #e8f0f8 0%, #f8fafc 30%, #ffffff 60%, #eef4f8 100%);
+  background-attachment: fixed;
+}
+
+/* Hero card wrapper — big white rounded card */
+.home-hero {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.8rem;
+  margin-bottom: 2rem;
+}
+
+.home-hero__categories {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b85450;  /* dark brick red */
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.2rem;
+}
+
+.home-hero__title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.home-hero__description {
+  font-size: 1.05rem;
+  color: #888888;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  max-width: 640px;
+}
+
+.home-hero__buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Deep blue solid button */
+.btn--deep-blue {
+  background-color: #1a3a5c !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 0.6em 1.5em !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
+.btn--deep-blue:hover {
+  background-color: #264d73 !important;
+}
+
+/* Deep blue outline button */
+.btn--deep-blue-outline {
+  background-color: transparent !important;
+  color: #1a3a5c !important;
+  border: 2px solid #1a3a5c !important;
+  border-radius: 8px !important;
+  padding: 0.5em 1.4em !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
+.btn--deep-blue-outline:hover {
+  background-color: #1a3a5c !important;
+  color: #ffffff !important;
+}
+
+/* Section heading for homepage sections below the hero (e.g. RESEARCH, PROJECTS) */
+.home-section__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b85450;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+
+.home-section__title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 1.2rem;
+}
+
+/* Update section — white cards for each recent item */
+.home-update__list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+}
+
+.home-update__item {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 1.2rem 1.6rem;
+  margin-bottom: 0.8rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.home-update__item:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.home-update__item-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.home-update__item-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+.home-update__item-title:hover {
+  color: #1a3a5c;
+  text-decoration: underline;
+}
+
+.home-update__item-tag {
+  color: #6c757d;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.home-update__item-date {
+  color: #adb5bd;
+  font-size: 0.78rem;
+  margin-left: auto;
+}
+
+.home-update__item-excerpt {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85rem;
+  color: #888888;
+  line-height: 1.5;
+}
+
+/* Sidebar: bio slightly larger than links below */
+.sidebar .author__bio {
+  font-size: 1rem !important;
+  color: #999 !important;
+}
+
+.sidebar p,
+.sidebar li {
+  font-size: 0.8rem !important;
+  color: #000000 !important;
+}
+
+.author__urls a {
+  font-size: 0.8rem !important;
+  color: #000000 !important;
+}
+
+.home-document { font-size: 18px; }
+.home-page { color: #494e52; font-size: 18px; line-height: 1.5; padding-top: 65px; }
+.home-page .site-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 10; }
+.home-page .site-header__inner { max-width: 1280px; min-height: 65px; padding: 0 18px; justify-content: flex-start; gap: 70px; }
+.home-page .site-brand { font-size: 18px; color: #494e52; font-weight: 700; }
+.home-page .site-brand__mark { display: none; }
+.home-page .site-nav { gap: 38px; }
+.home-page .site-nav a { padding: 19px 0 16px; font-size: 18px; color: #494e52; }
+.home-page .site-nav a[aria-current] { border-bottom-color: #494e52; }
+.home-page .site-main { max-width: 1280px; padding: 36px 18px 60px; }
+.home-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
+.home-sidebar { position: sticky; top: 101px; }
+.home-sidebar .author__avatar img { display: block; width: 210px; height: 210px; object-fit: cover; padding: 5px; border-radius: 50%; }
+.home-sidebar .author__name { font-size: 18px; margin: 12px 0 8px; font-weight: 700; }
+.home-sidebar .author__bio { margin: 0 0 20px; line-height: 1.5; }
+.home-sidebar .author__urls { list-style: none; padding: 0; margin: 0; }
+.home-sidebar .author__urls li { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.home-sidebar .author__urls svg { width: 15px; height: 15px; flex-shrink: 0; fill: #111; }
+.home-sidebar .author__urls a { text-decoration: none; }
+.home-content { min-width: 0; padding: 0 min(3.66vw, 52.7px); }
+.home-page-title { font-size: 28px; line-height: 1.2; margin: 0 0 8.6px; font-weight: 700; color: #494e52; }
+.home-body > p, .home-body > ul { font-size: 1.25em; line-height: 1.5; margin: 1em 0; }
+.home-body > ul { padding-left: 2em; }
+.home-body > ul li { margin-bottom: .5em; }
+.home-body .home-hero__title { font-size: 36px; margin: 18px 0 9px; }
+.home-body .home-hero__description { font-size: 1.25em; line-height: 1.7; }
+.home-body .home-hero__categories { font-size: 13.5px; color: #b85450; }
+.home-body .home-section__title { line-height: 1.5; font-size: 23.4px; margin-top: 0; }
+.home-body .home-update__item-title { font-size: 18px; text-decoration: underline; }
+.home-body .home-update__item-excerpt { font-size: 1.25em; line-height: 1.5; }
+.home-body .btn { display: inline-block; text-decoration: underline; line-height: 1.5; }
+.home-featured { margin: 2.5rem 0; }
+.home-body hr { border: 0; border-top: 1px solid #eee; margin: 18px 0; }
+.home-page .site-footer { max-width: none; padding: 24px max(24px, calc((100vw - 1244px) / 2)); background: #f2f3f3; font-size: 13px; }
+@media (max-width: 1100px) {
+  .home-layout { grid-template-columns: 230px minmax(0, 1fr); }
+  .home-content { padding: 0 20px; }
+  .home-sidebar .author__avatar img { width: 180px; height: 180px; }
+  .home-body .home-hero { padding: 36px 30px; }
+}
+@media (max-width: 760px) {
+  .home-page { padding-top: 0; }
+  .home-page .site-header { position: static; }
+  .home-page .site-header__inner { padding: 16px 22px 0; gap: 4px 20px; }
+  .home-page .site-nav { gap: 25px; }
+  .home-page .site-nav a { font-size: 14px; padding: 16px 0 14px; }
+  .home-page .site-main { padding: 24px 22px 48px; }
+  .home-layout { display: block; }
+  .home-sidebar { position: static; margin-bottom: 30px; }
+  .home-sidebar .author__avatar img { width: 100px; height: 100px; }
+  .home-sidebar .author__bio { max-width: 340px; font-size: 16px !important; }
+  .home-sidebar .author__urls { display: flex; flex-wrap: wrap; gap: 0 20px; }
+  .home-content { padding: 0; }
+  .home-page-title { font-size: 25px; margin-bottom: 16px; }
+  .home-body .home-hero { padding: 26px 22px; }
+  .home-body .home-hero__title { font-size: 27px; }
+  .home-body .home-hero__description, .home-body > p, .home-body > ul { font-size: 17px; }
+  .home-body .home-hero__categories { font-size: 11px; }
+  .home-body .home-hero__buttons { gap: 10px; }
+  .home-body .home-hero__buttons .btn { font-size: 12px !important; padding: 9px 12px !important; }
+  .home-body .home-update__item { padding: 18px 20px; }
+  .home-body .home-update__item-title { font-size: 16px; }
+  .home-body .home-update__item-excerpt { font-size: 16px; }
+  .home-body .home-update__item-date { font-size: 11px; }
+  .home-page .site-footer { margin: 0; padding: 22px; }
+}

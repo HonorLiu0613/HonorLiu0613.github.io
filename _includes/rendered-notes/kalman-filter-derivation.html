@@ -1,0 +1,251 @@
+<h1 data-heading="Derivation to kalman filter 引言叠甲" dir="auto" id="derivation-to-kalman-filter-引言叠甲">Derivation to kalman filter 引言叠甲</h1>
+<p dir="auto">本人也是控制小白，本文推导参考Dr.CAN的推导过程，仅作为个人学习比较，如有错误，敬请指正。</p>
+<h1 data-heading="1.问题引入" dir="auto" id="1问题引入">1.问题引入</h1>
+<p dir="auto">我们很正常的考虑一个问题，假设一个状态是一个比较稳定的值，那我们可以通过采样它得到一系列的值，然后取平均，作为估计值。如下：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\frac{1}{k}\sum_{i=1}^{k}x_{i} \tag{1}
+\]</span></p>
+<p dir="auto">对这个公式进行改写得到：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\frac{1}{k}\sum_{i=1}^{k-1}x_{i}+\frac{1}{k}x_{k-1} \tag{2}
+\]</span></p>
+<p dir="auto">提出一个<span class="math-inline">\({k-1}\)</span>项，得到：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\frac{1}{k}\frac{(k-1)}{(k-1)}\sum_{i=1}^{k-1}x_{i}+\frac{1}{k}x_{k-1} \tag{3}
+\]</span></p>
+<p dir="auto">可以看出求的是<span class="math-inline">\({k-1}\)</span>项的平均值，所以可以写成：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\frac{k-1}{k}\hat x_{k-1}+\frac{1}{k}x_{k-1} \tag{4}
+\]</span></p>
+<p dir="auto">展开：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\hat x_{k-1}+\frac{1}{k}x_{k-1}-\frac{1}{k}\hat x_{k-1} \tag{5}
+\]</span></p>
+<p dir="auto">合并：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\hat x_{k-1}+\frac{1}{k}(x_{k-1}-\hat x_{k-1}) \tag{6}
+\]</span></p>
+<p dir="auto">我们可以看到，这个公式就是卡尔曼滤波器的一个简化版本，它只考虑了上一时刻的估计值和当前时刻的测量值，而没有考虑噪声。k时刻的估计值可以由k-1时刻的估计值和k时刻的测量值得到，这个公式就是卡尔曼滤波器的基本公式。</p>
+<h1 data-heading="2.对于线性系统的分析与公式推导" dir="auto" id="2对于线性系统的分析与公式推导">2.对于线性系统的分析与公式推导</h1>
+<p dir="auto">假设我们有一个线性系统，其状态转移方程为：</p>
+<p dir="auto"><span class="math-display">\[
+x_{k}=Ax_{k-1}+Bu_{k-1}+w_{k-1} \tag{1}
+\]</span></p>
+<p dir="auto">其中，<span class="math-inline">\(x_{k}\)</span>是k时刻的状态，<span class="math-inline">\(A\)</span>是状态转移矩阵，<span class="math-inline">\(u_{k-1}\)</span>是k-1时刻的控制输入，<span class="math-inline">\(w_{k-1}\)</span>是k-1时刻的过程噪声，不可测量，但服从正态分布 <span class="math-inline">\(w_{k} \sim \mathcal{N}\big( 0, Q\big)\)</span>。其中<span class="math-inline">\(Q\)</span>是其协方差矩阵。</p>
+<p dir="auto">假设我们有一个测量方程，其测量值为：</p>
+<p dir="auto"><span class="math-display">\[
+z_{k}=Hx_{k}+v_{k} \tag{2}
+\]</span></p>
+<p dir="auto">其中，<span class="math-inline">\(z_{k}\)</span>是k时刻的测量值，<span class="math-inline">\(H\)</span>是测量矩阵，<span class="math-inline">\(v_{k}\)</span>是k时刻的测量噪声，不可测量，但服从正态分布<span class="math-inline">\(v_{k} \sim \mathcal{N}\big( 0, R\big)\)</span>。其中<span class="math-inline">\(R\)</span>是其协方差矩阵。</p>
+<p dir="auto">由于<span class="math-inline">\(w_{k-1}\)</span>和<span class="math-inline">\(v_{k}\)</span>是不可测量的，我们在实际使用的时候方程如下：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}^{-}=A\hat x_{k-1}+Bu_{k-1} \tag{3}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+z_{k}=Hx_{k} \tag{4}
+\]</span></p>
+<p dir="auto">其中，<span class="math-inline">\(\hat x_{k}^{-}\)</span> 是k时刻的先验状态估计值，因为其没进行任何的处理，<span class="math-inline">\(z_{k}\)</span>是k时刻的测量值估计值。<br>
+由公式4，我们可以得到：</p>
+<p dir="auto"><span class="math-display">\[
+x_{k}=H^{-1}z_{k} \tag{5}
+\]</span></p>
+<p dir="auto">由第一章数据融合的分析我们可以得到：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\hat x_{k}^{-}+\frac{1}{k}(x_{k}-\hat x_{k}^{-}) \tag{6}
+\]</span></p>
+<p dir="auto"><span class="math-inline">\(\hat x_{k}\)</span>是后验估计，<span class="math-inline">\(\hat x_{k}^{-}\)</span>是先验估计，<span class="math-inline">\(x_{k}\)</span>实际值，<span class="math-inline">\(G\)</span>的范围是0到1，带入公式5，则公式6可以写成：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\hat x_{k}^{-}+G(H^{-1}z_{k}-\hat x_{k}^{-}) \tag{7}
+\]</span></p>
+<p dir="auto">令<span class="math-inline">\(G = K_{k}H\)</span>得：</p>
+<p dir="auto"><span class="math-display">\[
+\hat x_{k}=\hat x_{k}^{-}+K_{k}H(H^{-1}z_{k}-\hat x_{k}^{-}) \tag{8}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+=\hat x_{k}^{-}+K_{k}(z_{k}-H\hat x_{k}^{-}) \tag{8}
+\]</span></p>
+<p dir="auto">其中<span class="math-inline">\(K_{k}\in\left[ 0, H^{-1}\right]\)</span><br>
+当<span class="math-inline">\(K_{k}= H^{-1}\)</span> 时,<br>
+<span class="math-inline">\(\hat x_{k}=H^{-1}z_{k}=x_{k}\)</span><br>
+说明更相信测量值。<br>
+当<span class="math-inline">\(K_{k}=0\)</span>时，<span class="math-inline">\(\hat x_{k} = \hat x_{k}^{-}\)</span><br>
+说明更相信估计值。<br>
+因此我们的目标是找到一个<span class="math-inline">\(K_{k}\)</span>,使得 <span class="math-inline">\(\hat x_{k}\)</span>更接近<span class="math-inline">\(x_{k}\)</span> 。<br>
+引入误差方程：</p>
+<p dir="auto"><span class="math-display">\[
+e_{k}=x_{k}-\hat x_{k} \tag{9}
+\]</span></p>
+<p dir="auto">前者为实际值，后者为估计值。<br>
+代入公式8得：</p>
+<p dir="auto"><span class="math-display">\[
+e_{k}=\hat x_{k}^{-}+K_{k}(z_{k}-H\hat x_{k}^{-})-x_{k} \tag{10}
+\]</span></p>
+<p dir="auto">中<span class="math-inline">\(e_{k}\)</span>满足<span class="math-inline">\(e_{k} \sim \mathcal{N}\big( 0, P_{k}\big)\)</span>。其中<span class="math-inline">\(P_{k}\)</span>是其协方差矩阵。</p>
+<p dir="auto">我们希望误差最小，即<span class="math-inline">\(e_{k} = 0\)</span>，因为其期望为0，因此<span class="math-inline">\(e_{k}\)</span>的方差尽可能的小，也就是协方差矩阵<span class="math-inline">\(P_{k}\)</span>的对角线：迹<span class="math-inline">\(trace(P_{k})\)</span>尽可能小，（协方差矩阵对角线表示方差）。所以问题变成如何找到一个<span class="math-inline">\(K_{k}\)</span>使得<span class="math-inline">\(trace\)</span>最小。</p>
+<p dir="auto">协方差的定义:</p>
+<p dir="auto"><span class="math-display">\[
+\boldsymbol P = \mathrm{Cov}(\boldsymbol e)
+=\mathbb{E}\Big[\,\big(\boldsymbol e-\boldsymbol \mu_{\boldsymbol e}\big)\,\big(\boldsymbol e-\boldsymbol \mu_{\boldsymbol e}\big)^\top\,\Big] \tag{11}
+\]</span></p>
+<p dir="auto">其中<span class="math-inline">\(\boldsymbol \mu_{\boldsymbol e}\)</span>是误差的均值，由于期望为0，所以<span class="math-inline">\(\boldsymbol \mu_{\boldsymbol e} = 0\)</span>，所以公式11可以简化为：</p>
+<p dir="auto"><span class="math-display">\[
+\boldsymbol P = \mathbb{E}\Big[\,\boldsymbol e\,\boldsymbol e^\top\,\Big] \tag{12}
+\]</span></p>
+<p dir="auto">本文中所有涉及的协方差计算都为此公式。<br>
+代入公式9：</p>
+<p dir="auto"><span class="math-display">\[
+\boldsymbol P = \mathbb{E}\Big[\,\big(x_{k}-\hat x_{k}\big)\,\big(x_{k}-\hat x_{k}\big)^\top\,\Big] \tag{13}
+\]</span></p>
+<p dir="auto">先整理<span class="math-inline">\(x_{k} - \hat x_{k}\)</span>:<br>
+代入公式8：</p>
+<p dir="auto"><span class="math-display">\[
+x_{k}-\hat x_{k} = x_{k} - \hat x_{k}^{-} - K_{k}(z_{k}-H\hat x_{k}^{-}) \tag{14}
+\]</span></p>
+<p dir="auto">展开整理：</p>
+<p dir="auto"><span class="math-display">\[
+x_{k}-\hat x_{k} = x_{k} - \hat x_{k}^{-} - K_{k}z_{k} + K_{k}H\hat x_{k}^{-} \tag{15}
+\]</span></p>
+<p dir="auto">把<span class="math-inline">\(z_{k}\)</span>用公式2表示：</p>
+<p dir="auto"><span class="math-display">\[
+= x_{k} - \hat x_{k}^{-} - K_{k}Hx_{k} + K_{k}H\hat x_{k}^{-} - K_{k}v_{k} \tag{16}
+\]</span></p>
+<p dir="auto">提出<span class="math-inline">\(x_{k} - \hat x_{k}^{-}\)</span>:</p>
+<p dir="auto"><span class="math-display">\[
+= (x_{k} - \hat x_{k}^{-}) - K_{k}H(x_{k} - \hat x_{k}^{-}) - K_{k}v_{k} \tag{17}
+\]</span></p>
+<p dir="auto">整理：</p>
+<p dir="auto"><span class="math-display">\[
+= (I - K_{k}H)(x_{k} - \hat x_{k}^{-}) - K_{k}v_{k} \tag{18}
+\]</span></p>
+<p dir="auto">定义 <span class="math-inline">\(e_{k}^{-} = x_{k} - \hat x_{k}^{-}\)</span>，<span class="math-inline">\(e_{k}^{-}\)</span> 为先验误差：<br>
+代入公式12，求<span class="math-inline">\(P_{k}\)</span>:</p>
+<p dir="auto"><span class="math-display">\[
+\boldsymbol P_{k} = \mathbb{E}\Big[\,\big((I - K_{k}H)e_{k}^{-} - K_{k}v_{k}\big)\,\big((I - K_{k}H)e_{k}^{-} - K_{k}v_{k}\big)^\top\,\Big] \tag{19}
+\]</span></p>
+<p dir="auto">由转置的性质展开：</p>
+<p dir="auto"><span class="math-display">\[
+=\mathbb{E}[(( I- K_{k} H) e_{k}^{-}- K_{k} v_{k})
+({e_{k}^{-}}^\top( I- K_{k} H)^\top-{v_{k}}^\top K_{k}^\top)]
+\]</span></p>
+<p dir="auto">整理得：</p>
+<p dir="auto"><span class="math-display">\[
+=\mathbb{E}[( I- K_{k} H) e_{k}^{-}{e_{k}^{-}}^\top( I- K_{k} H)^\top +  K_{k} v_{k}{v_{k}}^\top K_{k}^\top - ( I- K_{k} H) e_{k}^{-}{v_{k}}^\top K_{k}^\top -  K_{k} v_{k}{e_{k}^{-}}^\top( I- K_{k} H)^\top] \tag{20}
+\]</span></p>
+<p dir="auto">先看后两项：<br>
+对其求均值：</p>
+<p dir="auto"><span class="math-display">\[
+\mathbb{E}[(I- K_{k} H) e_{k}^{-}{v_{k}}^\top K_{k}^\top -  K_{k} v_{k}{e_{k}^{-}}^\top( I- K_{k} H)^\top] \tag{21}
+\]</span></p>
+<p dir="auto"><span class="math-inline">\(( I- K_{k} H)\)</span>和 <span class="math-inline">\(K_{k}^\top\)</span>是常数，所以可以提出：</p>
+<p dir="auto"><span class="math-display">\[
+\mathbb{E}[( I- K_{k} H) e_{k}^{-}{v_{k}}^\top K_{k}^\top -  K_{k} v_{k}{e_{k}^{-}}^\top( I- K_{k} H)^\top] \tag{22}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+= ( I- K_{k} H)\mathbb{E}[ e_{k}^{-}{v_{k}}^\top] K_{k}^\top -  K_{k}\mathbb{E}[ v_{k}{e_{k}^{-}}^\top]( I- K_{k} H)^\top \tag{23}
+\]</span></p>
+<p dir="auto">由于<span class="math-inline">\(e_{k}^{-}{v_{k}}^\top\)</span>以及<span class="math-inline">\(v_{k}{e_{k}^{-}}^\top\)</span>都相互独立，则由期望的性质：<br>
+<span class="math-inline">\(\mathbb{E}[e_{k}^{-}{v_{k}}^\top] = \mathbb{E}[e_{k}^{-}]\mathbb{E}[v_{k}^\top] = 0\)</span>，所以公式20可化简：</p>
+<p dir="auto"><span class="math-display">\[
+\mathbb{E}[(I- K_{k} H) e_{k}^{-}{e_{k}^{-}}^\top( I- K_{k} H)^\top +  K_{k} v_{k}{v_{k}}^\top K_{k}^\top ] \tag{24}
+\]</span></p>
+<p dir="auto">把常数项提出：</p>
+<p dir="auto"><span class="math-display">\[
+= ( I- K_{k} H)\mathbb{E}[ e_{k}^{-}{e_{k}^{-}}^\top]( I- K_{k} H)^\top +  K_{k}\mathbb{E}[ v_{k}{v_{k}}^\top] K_{k}^\top \tag{25}
+\]</span></p>
+<p dir="auto">定义<span class="math-inline">\(P_{k}^{-} = \mathbb{E}[ e_{k}^{-}{e_{k}^{-}}^\top]\)</span>，<span class="math-inline">\(Q = \mathbb{E}[ v_{k}{v_{k}}^\top]\)</span>，先验误差的协方差矩阵<span class="math-inline">\(P_{k}^{-}\)</span>和测量误差的协方差矩阵<span class="math-inline">\(Q\)</span>代入公式25：</p>
+<p dir="auto"><span class="math-display">\[
+\boldsymbol P_{k} = ( I- K_{k} H)P_{k}^{-}( I- K_{k} H)^\top +  K_{k}Q K_{k}^\top \tag{26}
+\]</span></p>
+<p dir="auto">由于<span class="math-inline">\(P_{k}\)</span>是协方差矩阵，所以其迹为：</p>
+<p dir="auto"><span class="math-display">\[
+trace(\boldsymbol P_{k}) = trace(( I- K_{k} H)P_{k}^{-}( I- K_{k} H)^\top +  K_{k}Q K_{k}^\top) \tag{27}
+\]</span></p>
+<p dir="auto">又迹的线性性质，且展开得到：</p>
+<p dir="auto"><span class="math-display">\[
+tr(P_{k}) = tr(( I- K_{k} H)P_{k}^{-}( I- K_{k} H)^\top) + tr( K_{k}Q K_{k}^\top) \tag{28}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+  = tr(P_{k}^{-}) + tr( K_{k}Q K_{k}^\top) + tr(K_{k}HP_{k}^{-}H^\top K_{k}^\top) - tr(P_{k}^{-}H K_{k}^\top) - tr(K_{k}HP_{k}^{-})\tag{29}
+\]</span></p>
+<p dir="auto">由于 <span class="math-inline">\(P_{k}^{-}\)</span> 是先验误差的协方差矩阵，因此 <span class="math-inline">\(P_{k}^{-} = P_{k}^{-\top}\)</span> ，所以 <span class="math-inline">\(tr(P_{k}^{-}) = P_{k}^{-\top}\)</span> ，不难看出公式29后两项是互为转置的，其迹相等，所以公式29可以化简为：</p>
+<p dir="auto"><span class="math-display">\[
+tr(P_{k}) = tr(P_{k}^{-}) + tr( K_{k}Q K_{k}^\top) + tr(K_{k}HP_{k}^{-}H^\top K_{k}^\top)+2tr(K_{k}HP_{k}^{-}) \tag{30}
+\]</span></p>
+<p dir="auto">还记得我们的初心：找到一个<span class="math-inline">\(K_{k}\)</span>使得<span class="math-inline">\(trace\)</span>最小，所以我们需要对<span class="math-inline">\(K_{k}\)</span>求导，并令其等于0，则：</p>
+<p dir="auto"><span class="math-display">\[
+\frac{\partial tr(P_{k})}{\partial K_{k}} = 0 \tag{31}
+\]</span></p>
+<p dir="auto">由<span class="math-inline">\(\frac{\partial tr(AB)}{\partial A} = B^T\)</span>和<span class="math-inline">\(\frac{\partial tr(ABA^T)}{\partial A} = 2AB\)</span>得（论证可自行用两个2维矩阵计算）：</p>
+<p dir="auto"><span class="math-display">\[
+\frac{\partial tr( K_{k}Q K_{k}^\top)}{\partial K_{k}}  = 2Q K_{k} \tag{32}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+\frac{\partial tr(K_{k}HP_{k}^{-}H^\top K_{k}^\top)}{\partial K_{k}}  = 2K_{k} H P_{k}^{-} H^\top \tag{33}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+\frac{\partial 2tr(K_{k}HP_{k}^{-})}{\partial K_{k}}  = 2 P_{k}^{-}H^\top  \tag{34}
+\]</span></p>
+<p dir="auto">代入公式31整理得：</p>
+<p dir="auto"><span class="math-display">\[
+\frac{\partial tr(P_{k})}{\partial K_{k}} = 2Q K_{k} + 2K_{k} H P_{k}^{-} H^\top - 2 P_{k}^{-}H^\top = 0 \tag{35}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+Q K_{k} + K_{k} H P_{k}^{-} H^\top -  P_{k}^{-}H^\top = 0 \tag{36}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+K_{k} (Q + H P_{k}^{-} H^\top) = P_{k}^{-}H^\top \tag{37}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+K_{k} = P_{k}^{-}H^\top (Q + H P_{k}^{-} H^\top)^{-1} \tag{38}
+\]</span></p>
+<p dir="auto">其中<span class="math-inline">\(P_{k}^{-}\)</span>是先验误差的协方差矩阵，<span class="math-inline">\(H\)</span>是观测矩阵，<span class="math-inline">\(Q\)</span>是测量噪声的协方差矩阵。至此我们费了很多功夫推导出了卡尔曼增益<span class="math-inline">\(K_{k}\)</span>。</p>
+<h1 data-heading="3.P_{k}^{-}的求解推导" dir="auto" id="3p_k-的求解推导">3.<span class="math-inline">\(P_{k}^{-}\)</span>的求解推导</h1>
+<p dir="auto">由于<span class="math-inline">\(P_{k}^{-}\)</span>是先验误差的协方差矩阵，所以其定义为：</p>
+<p dir="auto"><span class="math-display">\[
+P_{k}^{-} = \mathbb{E}[\,(x_{k}-\hat x_{k}^{-})\,(x_{k}-\hat x_{k}^{-})^\top\,] \tag{1}
+\]</span></p>
+<p dir="auto">先进行<span class="math-inline">\((x_{k}-\hat x_{k}^{-})\)</span>的求解，代入第二章节公式8：</p>
+<p dir="auto"><span class="math-display">\[
+e_{k}^{-} = Ax_{k-1} + Bu_{k-1} + w_{k-1} - A\hat x_{k-1} - Bu_{k-1}\tag{2}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+= A(x_{k-1} - \hat x_{k-1}) + w_{k-1} \tag{3}
+\]</span></p>
+<p dir="auto">又有<span class="math-inline">\(e_{k-1} = x_{k-1} - \hat x_{k-1}\)</span>:</p>
+<p dir="auto"><span class="math-display">\[
+e_{k}^{-} = Ae_{k-1} + w_{k-1} \tag{4}
+\]</span></p>
+<p dir="auto">代入公式1：</p>
+<p dir="auto"><span class="math-display">\[
+P_{k}^{-} =  \mathbb{E}[(Ae_{k-1} + w_{k-1})(Ae_{k-1} + w_{k-1})^\top] \tag{5}
+\]</span></p>
+<p dir="auto">展开得：</p>
+<p dir="auto"><span class="math-display">\[
+P_{k}^{-} =  \mathbb{E}[Ae_{k-1}e_{k-1}^\top A^\top + Ae_{k-1}w_{k-1}^\top + w_{k-1}e_{k-1}^\top A^\top + w_{k-1}w_{k-1}^\top] \tag{6}
+\]</span></p>
+<p dir="auto">由期望的性质（前文也有所用到，在此不做详细阐述）<span class="math-inline">\(A\)</span>是常数，<span class="math-inline">\(e_{k-1}与w_{k-1}\)</span>相互独立且期望为0，整理如下：</p>
+<p dir="auto"><span class="math-display">\[
+P_{k}^{-} =  \mathbb{E}[Ae_{k-1}e_{k-1}^\top A^\top] + \mathbb{E}[w_{k-1}w_{k-1}^\top] \tag{7}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+P_{k}^{-} =  A\mathbb{E}[e_{k-1}e_{k-1}^\top] A^\top + Q \tag{8}
+\]</span></p>
+<p dir="auto"><span class="math-display">\[
+=  A P_{k-1} A^\top + Q \tag{9}
+\]</span></p>
+<p dir="auto">其中<span class="math-inline">\(P_{k-1}\)</span>是<span class="math-inline">\(e_{k-1}\)</span>误差的协方差矩阵，<span class="math-inline">\(Q\)</span>是过程噪声的协方差矩阵。至此我们推导出了<span class="math-inline">\(P_{k}^{-}\)</span>。</p>
+<h1 data-heading="4.kalman滤波的迭代过程与总结" dir="auto" id="4kalman滤波的迭代过程与总结">4.kalman滤波的迭代过程与总结</h1>
+<p dir="auto">至此我们完成了所有的推导，这是一个递归的过程，过程如下：<br>
+（1）时间更新阶段：根据系统状态转移方程，由 <span class="math-inline">\(k-1\)</span> 时刻的后验最优状态估计与协方差矩阵，预测得到 <span class="math-inline">\(k\)</span> 时刻未利用观测信息的先验状态与先验误差协方差：</p>
+<p dir="auto"><span class="math-display">\[\hat x_{k}^{-} = A\hat x_{k-1} + Bu_{k-1}\]</span></p>
+<p dir="auto"><span class="math-display">\[P_{k}^{-} = A P_{k-1} A^\top + Q\]</span></p>
+<p dir="auto">其中，<span class="math-inline">\(\hat x_{k-1}\)</span>、<span class="math-inline">\(P_{k-1}\)</span> 为上一时刻的最优状态估计与误差协方差矩阵，<span class="math-inline">\(A\)</span> 为状态转移矩阵，<span class="math-inline">\(B\)</span> 为控制输入矩阵，<span class="math-inline">\(Q\)</span> 为系统过程噪声协方差矩阵，用于描述模型建模误差与系统扰动的不确定性。</p>
+<p dir="auto">（2）测量更新阶段：引入 <span class="math-inline">\(k\)</span> 时刻传感器观测信息，对先验预测结果进行修正，得到当前时刻最优后验估计。首先计算卡尔曼增益，自适应权衡模型预测可信度与传感器观测可信度：</p>
+<p dir="auto"><span class="math-display">\[K_{k} = P_{k}^{-}H^\top (H P_{k}^{-} H^\top + R)^{-1}\]</span></p>
+<p dir="auto">随后利用观测残差修正先验状态，观测残差反映实际观测值与模型预测观测值的偏差，通过卡尔曼增益加权修正后，得到当前时刻最优状态估计：</p>
+<p dir="auto"><span class="math-display">\[\hat x_{k} = \hat x_{k}^{-} + K_{k} (z_{k} - H\hat x_{k}^{-})\]</span></p>
+<p dir="auto">最后采用 Joseph 稳定形式更新误差协方差矩阵，该形式可保证数值迭代过程中协方差矩阵始终保持对称正定，有效提升滤波算法的数值稳定性:</p>
+<p dir="auto"><span class="math-display">\[P_{k} = ( I- K_{k} H)P_{k}^{-}( I- K_{k} H)^\top + K_{k}R K_{k}^\top\]</span></p>
+<p dir="auto">其中，<span class="math-inline">\(H\)</span> 为观测矩阵，<span class="math-inline">\(R\)</span> 为观测噪声协方差矩阵，<span class="math-inline">\(z_{k}\)</span> 为当前时刻观测数据。<br>
+完成单次迭代后，<span class="math-inline">\(\hat x_k\)</span> 与 <span class="math-inline">\(P_{k}\)</span> 作为下一时刻迭代的初始后验信息，持续递归更新，实现对系统状态的连续最优估计。</p>
+<p dir="auto">后续有机会将更新关于非线性系统EKF的推导，欢迎批评指正。</p>

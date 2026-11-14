@@ -1,0 +1,21 @@
+---
+title: Notes
+permalink: /notes/
+section: notes
+eyebrow: LEARNING IN PUBLIC
+description: Notes on robotics, control, software, and life.
+redirect_from: [/posts/, /works/, /year-archive/, /wordpress/blog-posts/, /categories/, /tags/]
+---
+{% assign notes = site.notes | where: 'publish', true | sort: 'date' | reverse %}
+<section class="notes-browser" data-index-url="{{ '/notes-index.json' | relative_url }}" aria-label="Browse notes">
+  <div class="notes-filters" id="notes-filters" hidden>
+    <div class="search-field"><label for="note-search">Search notes</label><input id="note-search" type="search" placeholder="Search titles, content, or tags…" autocomplete="off"></div>
+    <div><label for="domain-filter">Field</label><select id="domain-filter"><option value="">All fields</option></select></div>
+    <div><label for="tag-filter">Tag</label><select id="tag-filter"><option value="">All tags</option></select></div>
+    <button class="filter-reset" id="filter-reset" type="button">Reset</button>
+  </div>
+  <p class="result-count" id="result-count" role="status" aria-live="polite">{{ notes.size }} notes</p>
+  <div class="note-grid" id="notes-list">{% for note in notes %}{% include note-card.html note=note %}{% endfor %}</div>
+  <p class="empty-state" id="empty-state" hidden>No notes match your search. Try another term or reset the filters.</p>
+  <noscript><p>All public notes are listed below. Enable JavaScript to search and filter.</p></noscript>
+</section>

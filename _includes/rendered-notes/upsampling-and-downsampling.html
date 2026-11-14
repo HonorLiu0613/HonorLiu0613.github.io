@@ -1,0 +1,66 @@
+<h2 data-heading="一句话理解" dir="auto" id="一句话理解">一句话理解</h2>
+<p dir="auto">下采样减少特征图的高度和宽度，扩大感受野并降低计算量；上采样恢复空间尺寸，常用于解码器和像素级预测。</p>
+<h2 data-heading="输入和输出" dir="auto" id="输入和输出">输入和输出</h2>
+<p dir="auto">假设输入形状为 <code>[B, C, H, W]</code>：</p>
+<ul>
+<li dir="auto">下采样：通常变为 <code>[B, C或C', H/2, W/2]</code></li>
+<li dir="auto">上采样：通常变为 <code>[B, C或C', 2H, 2W]</code></li>
+<li dir="auto">是否改变通道数，要看后面是否接卷积；池化和插值本身一般不改通道数</li>
+</ul>
+<h2 data-heading="下采样方法" dir="auto" id="下采样方法">下采样方法</h2>
+<h3 data-heading="最大池化" dir="auto" id="最大池化">最大池化</h3>
+<pre class="language-python"><code class="language-python is-loaded">pooled <span class="token operator">=</span> F<span class="token punctuation">.</span>max_pool2d<span class="token punctuation">(</span>x<span class="token punctuation">,</span> kernel_size<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+</code></pre>
+<p dir="auto">当 <code>x.shape = [B, C, 256, 256]</code> 时，默认步长为 2：</p>
+<pre class="language-text"><code class="language-text is-loaded">[B, C, 256, 256] → [B, C, 128, 128]
+</code></pre>
+<p dir="auto">每个 <code>2×2</code> 区域取一个最大值。它没有可学习参数。</p>
+<h3 data-heading="带步长的卷积" dir="auto" id="带步长的卷积">带步长的卷积</h3>
+<pre class="language-python"><code class="language-python is-loaded">layer <span class="token operator">=</span> nn<span class="token punctuation">.</span>Conv2d<span class="token punctuation">(</span>C_in<span class="token punctuation">,</span> C_out<span class="token punctuation">,</span> kernel_size<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> stride<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> padding<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+</code></pre>
+<p dir="auto">它同时可以改变通道数和空间尺寸，并且卷积核参数可以学习。</p>
+<h2 data-heading="上采样方法" dir="auto" id="上采样方法">上采样方法</h2>
+<h3 data-heading="插值" dir="auto" id="插值">插值</h3>
+<pre class="language-python"><code class="language-python is-loaded">up <span class="token operator">=</span> F<span class="token punctuation">.</span>interpolate<span class="token punctuation">(</span>
+    x<span class="token punctuation">,</span>
+    scale_factor<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+    mode<span class="token operator">=</span><span class="token string">"bilinear"</span><span class="token punctuation">,</span>
+    align_corners<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+</code></pre>
+<p dir="auto">插值没有可学习参数。也可以直接指定目标尺寸：</p>
+<pre class="language-python"><code class="language-python is-loaded">up <span class="token operator">=</span> F<span class="token punctuation">.</span>interpolate<span class="token punctuation">(</span>x<span class="token punctuation">,</span> size<span class="token operator">=</span>skip<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> mode<span class="token operator">=</span><span class="token string">"bilinear"</span><span class="token punctuation">,</span> align_corners<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+</code></pre>
+<p dir="auto">在 U-Net 中，指定为跳跃连接特征的尺寸，比写死放大倍数更稳妥。</p>
+<h3 data-heading="转置卷积" dir="auto" id="转置卷积">转置卷积</h3>
+<pre class="language-python"><code class="language-python is-loaded">layer <span class="token operator">=</span> nn<span class="token punctuation">.</span>ConvTranspose2d<span class="token punctuation">(</span>
+    C_in<span class="token punctuation">,</span> C_out<span class="token punctuation">,</span> kernel_size<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> stride<span class="token operator">=</span><span class="token number">2</span>
+<span class="token punctuation">)</span>
+</code></pre>
+<p dir="auto">它带可学习参数，既能改变空间尺寸，也能改变通道数。详见 <a href="/notes/transpose-convolution/" class="internal-link" target="_blank" rel="noopener nofollow">1. 转置卷积 Transpose Conv</a>。</p>
+<h2 data-heading="一个网络中的尺寸例子" dir="auto" id="一个网络中的尺寸例子">一个网络中的尺寸例子</h2>
+<p dir="auto">以 <code>256×256</code> 输入为例：</p>
+<pre class="language-text"><code class="language-text is-loaded">下采样：256×256 → 128×128 → 64×64 → 32×32
+上采样：32×32 → 64×64 → 128×128 → 256×256
+</code></pre>
+<p dir="auto">在 SmokeNet 中：</p>
+<pre class="language-text"><code class="language-text is-loaded">feature4 上采样到 feature3 的尺寸
+与 feature3 沿 dim=1 拼接
+再用卷积融合通道
+</code></pre>
+<h2 data-heading="容易弄错的地方" dir="auto" id="容易弄错的地方">容易弄错的地方</h2>
+<ul>
+<li dir="auto"><code>max_pool2d</code> 和 <code>interpolate</code> 通常只改变高、宽，不改变通道数。</li>
+<li dir="auto"><code>torch.cat(..., dim=1)</code> 不是上采样；拼接前高、宽必须相同。</li>
+<li dir="auto">插值是固定规则，转置卷积的上采样过程可以学习。</li>
+<li dir="auto">输入尺寸为奇数时，连续池化可能出现不能简单除以 2 的情况，应检查实际 shape。</li>
+</ul>
+<h2 data-heading="相关知识" dir="auto" id="相关知识">相关知识</h2>
+<ul>
+<li dir="auto"><a href="/notes/transpose-convolution/" class="internal-link" target="_blank" rel="noopener nofollow">1. 转置卷积 Transpose Conv</a></li>
+</ul>
+<h2 data-heading="参考资料" dir="auto" id="参考资料">参考资料</h2>
+<ul>
+<li dir="auto"><a data-tooltip-position="top" aria-label="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html" rel="noopener nofollow" class="external-link" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html" target="_blank">PyTorch interpolate</a></li>
+<li dir="auto"><a data-tooltip-position="top" aria-label="https://pytorch.org/docs/stable/generated/torch.nn.functional.max_pool2d.html" rel="noopener nofollow" class="external-link" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.max_pool2d.html" target="_blank">PyTorch max_pool2d</a></li>
+</ul>

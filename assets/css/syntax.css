@@ -1,0 +1,12 @@
+/* Rouge syntax colors, scoped to article code blocks. */
+.note-body .highlight .c, .note-body .highlight .c1, .note-body .highlight .cm, .note-body .highlight .cp, .note-body .highlight .cs { color: #6a7f6b; font-style: italic; }
+.note-body .highlight .k, .note-body .highlight .kd, .note-body .highlight .kn, .note-body .highlight .kp, .note-body .highlight .kr, .note-body .highlight .kt { color: #8c45aa; }
+.note-body .highlight .s, .note-body .highlight .s1, .note-body .highlight .s2, .note-body .highlight .sb, .note-body .highlight .sc, .note-body .highlight .sd, .note-body .highlight .sh, .note-body .highlight .sx { color: #99682d; }
+.note-body .highlight .si, .note-body .highlight .se, .note-body .highlight .sr { color: #ad493e; }
+.note-body .highlight .m, .note-body .highlight .mi, .note-body .highlight .mf, .note-body .highlight .mh, .note-body .highlight .mo, .note-body .highlight .il { color: #247f84; }
+.note-body .highlight .nf, .note-body .highlight .nc, .note-body .highlight .ne, .note-body .highlight .nb { color: #286b9b; }
+.note-body .highlight .na, .note-body .highlight .nt, .note-body .highlight .nv, .note-body .highlight .vc, .note-body .highlight .vg, .note-body .highlight .vi { color: #9d4b77; }
+.note-body .highlight .o, .note-body .highlight .ow { color: #6d5498; }
+.note-body .highlight .err { color: #b63242; }
+.note-body .highlight .gd { color: #a3333d; background: #ffe9ec; }
+.note-body .highlight .gi { color: #2b7450; background: #e6f4ed; }
