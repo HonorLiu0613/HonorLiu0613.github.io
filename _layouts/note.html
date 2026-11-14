@@ -5,10 +5,10 @@ layout: default
   <article class="note-article">
     <header class="note-heading">
       <a class="back-link" href="{{ '/' | append: page.section | append: '/' | relative_url }}">← {{ page.section | capitalize }}</a>
-      <p class="eyebrow">{{ page.domain | default: page.kind | default: 'Notes' }}</p>
+      <p class="note-domain"><span class="field-badge" data-tone="{{ page.domain | default: page.kind | note_tone }}">{{ page.domain | default: page.kind | default: 'Notes' }}</span></p>
       <h1>{{ page.title }}</h1>
       <div class="note-meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %d, %Y' }}</time>{% if page.updated %}<span>Updated {{ page.updated | date: '%b %d, %Y' }}</span>{% endif %}{% if page.period %}<span>{{ page.period }}</span>{% endif %}</div>
-      {% if page.tags.size > 0 %}<div class="tag-list">{% for tag in page.tags %}<a class="tag" href="{{ '/notes/' | relative_url }}?tag={{ tag | url_encode }}">{{ tag }}</a>{% endfor %}</div>{% endif %}
+      {% if page.tags.size > 0 %}<div class="tag-list">{% for tag in page.tags %}<a class="tag" data-tone="{{ tag | note_tone }}" href="{{ '/notes/' | relative_url }}?tag={{ tag | url_encode }}">{{ tag }}</a>{% endfor %}</div>{% endif %}
     </header>
     <div class="note-body markdown-rendered" id="note-content">{% if page.rendered_body %}{% include {{ page.rendered_body }} %}{% else %}{{ content }}{% endif %}</div>
     {% if page.related_notes.size > 0 %}<section class="related-notes"><h2>Related notes</h2><ul>{% for path in page.related_notes %}{% assign related = site.notes | where: 'url', path | where: 'publish', true | first %}{% if related %}<li><a href="{{ related.url | relative_url }}">{{ related.title }}</a></li>{% endif %}{% endfor %}</ul></section>{% endif %}
