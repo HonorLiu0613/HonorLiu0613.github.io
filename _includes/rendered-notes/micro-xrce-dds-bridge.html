@@ -4,7 +4,7 @@
 <p dir="auto">代理端(Agent)充当客户端的代理，使其能够在DDS全局数据空间中发布和订阅话题。</p>
 <p dir="auto"><img width="700" alt="Architecture uXRCE-DDS with ROS 2" src="https://docs.px4.io/v1.17/assets/architecture_xrce-dds_ros2.CpY9H3P9.svg" referrerpolicy="no-referrer"></p>
 <p dir="auto"><code>uXRCE-DDS 中间件</code>由运行在 <code>PX4</code> 上的客户端和运行在伴随计算机上的代理组成，两者之间通过串口或 <code>UDP</code> 链路实现双向数据交换。代理作为客户端的代理，使其能够发布和订阅全球 DDS 数据空间中的主题。</p>
-<p dir="auto"><em>相关笔记</em>：<a href="/notes/tcp-udp-protocols/" class="internal-link" target="_blank" rel="noopener nofollow">3. UDP与TCP协议</a></p>
+<p dir="auto"><em>相关笔记</em>：<span class="unpublished-link">3. UDP与TCP协议</span></p>
 <h2 data-heading="代码构建" dir="auto" id="代码构建">代码构建</h2>
 <p dir="auto"><code>PX4 uxrce_dds_client</code> 在构建时生成，默认包含在 <code>PX4</code> 中。<em>代理不依赖客户端代码。它可以独立构建，也可以在 ROS 2 工作区中构建</em>，或者作为 <code>Ubuntu</code> 上的 <code>snap</code> 包安装。</p>
 <p dir="auto">在 Ubuntu 系统中，你可以从源代码构建该软件，并使用以下命令单独安装该代理程序：</p>

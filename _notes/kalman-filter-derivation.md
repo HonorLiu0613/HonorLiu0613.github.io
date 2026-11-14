@@ -7,25 +7,26 @@ publish: true
 domain: Control & Estimation
 tags:
   - Control
-  - Kalman filter
   - Mathematics
 featured: true
 redirect_from:
   - /portfolio/2026-08-29-Derivation-to-kalman-filter/
 web_id: kalman-filter-derivation
 web_slug: kalman-filter-derivation
-修改时间: 2026-11-14 20:00:19
+修改时间: 2026-11-14 20:42:01
 rendered_body: rendered-notes/kalman-filter-derivation.html
-rendered_source_hash: 1a17ce16aba57c6fcc5bebd36a6c2ae2cd1933407221b6581de0bbb483d0cc84
+rendered_source_hash: 0d439792f5bc222fa536a224e825f46cc43c053b47be15d9ef4d11eb17d0ac24
 source_vault_path: 02-知识笔记/3. 控制与估计/1. 卡尔曼滤波 kalman-filter-derivation.md
 mathjax: true
 render_with_liquid: false
 ---
 
 # Derivation to kalman filter 引言叠甲
+
 本人也是控制小白，本文推导参考Dr.CAN的推导过程，仅作为个人学习比较，如有错误，敬请指正。
 
 # 1.问题引入
+
 我们很正常的考虑一个问题，假设一个状态是一个比较稳定的值，那我们可以通过采样它得到一系列的值，然后取平均，作为估计值。如下：
 
 $$
