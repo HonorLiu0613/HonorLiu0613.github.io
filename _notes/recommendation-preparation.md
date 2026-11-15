@@ -3,7 +3,7 @@ title: Ready for Recommendation...
 date: 2026-08-06
 tags:
   - Personal
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: Life
 excerpt: Notes from preparing for graduate recommendation and interviews.
@@ -11,7 +11,7 @@ redirect_from:
   - /preparing-for-recomendation/
 web_id: recommendation-preparation
 web_slug: recommendation-preparation
-修改时间: 2026-11-14 20:36:48
+修改时间: 2026-11-14 21:16:08
 featured: false
 rendered_body: rendered-notes/recommendation-preparation.html
 rendered_source_hash: b06d1f445dd9612e44bbed15da1fc9e086d5a5444133e41f3403a06896c9a247

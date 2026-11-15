@@ -3,7 +3,7 @@ title: Hello World — My first blog
 date: 2026-07-31
 tags:
   - Personal
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: Life
 excerpt: The start of a personal space for notes, projects, and experiences.
@@ -11,7 +11,7 @@ redirect_from:
   - /posts/2026/07/hello-world/
 web_id: hello-world
 web_slug: hello-world
-修改时间: 2026-11-14 20:37:10
+修改时间: 2026-11-14 21:15:46
 featured: false
 rendered_body: rendered-notes/hello-world.html
 rendered_source_hash: 25ddce1154c980ba988a6104515219723ccefc59100f9b6cbd99150ac906a50b

@@ -1,7 +1,7 @@
 'use strict';
 const nativeRequire=require;
 const modules={
-'./sync-core': function(module,exports,require){
+"./sync-core": function(module,exports,require){
 'use strict';
 const crypto = require('crypto');
 const path = require('path');
@@ -105,7 +105,7 @@ function classify(document, slug, fallbackFolder='05-闲杂随记') {
 module.exports = {hash,canonical,fingerprint,parseDocument,serialize,direction,inside,safeSlug,slugFromFile,classify,normalized,MANAGED,MODES,safeFolder,inferDomain};
 
 },
-'./border-snapshot': function(module,exports,require){
+"./border-snapshot": function(module,exports,require){
 'use strict';
 const FIXTURE = '<h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6><p>A paragraph with <strong>bold</strong>, <em>italic</em>, <code>inline code</code>, <a href="https://example.com">a link</a>, and <mark>highlight</mark>.</p><ul><li>First item</li><li>Second item<ul><li>Nested item</li></ul></li></ul><ol><li>Ordered item</li></ol><blockquote><p>A quoted paragraph.</p></blockquote><div class="callout" data-callout="note"><div class="callout-title"><div class="callout-title-inner">Note title</div></div><div class="callout-content"><p>Callout paragraph.</p></div></div><table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>One</td><td>Two</td></tr></tbody></table><pre><code class="language-python"><span class="token comment"># Comment</span> <span class="token keyword">def</span> <span class="token function">example</span><span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">hello</span></code></pre><hr>';
 const PROPS = ['color','background-color','font-family','font-size','font-weight','font-style','font-variant','line-height','letter-spacing','text-decoration-line','text-decoration-color','text-underline-offset','text-indent','margin-top','margin-bottom','padding-top','padding-right','padding-bottom','padding-left','border-top','border-right','border-bottom','border-left','border-radius','white-space','tab-size','list-style-type','border-collapse'];
@@ -163,7 +163,7 @@ function css(snapshot) {
 module.exports={capture,css,FIXTURE};
 
 },
-'./render-utils': function(module,exports,require){
+"./render-utils": function(module,exports,require){
 'use strict';
 const {hash} = require('./sync-core');
 const escapeHtml = value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -218,7 +218,7 @@ function restoreMath(html, math) {
 module.exports={escapeHtml,headingId,protectMath,restoreMath};
 
 },
-'./git-publisher': function(module,exports,require){
+"./git-publisher": function(module,exports,require){
 'use strict';
 const fs=require('fs');
 const path=require('path');
@@ -311,7 +311,7 @@ async function publish(root,settings,expected,message) {
 module.exports={defaultExecutable,redact,run,plan,publish,signature};
 
 },
-'./main': function(module,exports,require){
+"./main": function(module,exports,require){
 'use strict';
 const {Plugin,PluginSettingTab,Setting,Notice,Modal,MarkdownRenderer,Component,parseYaml,stringifyYaml}=require('obsidian');
 const fs=require('fs');
@@ -322,7 +322,8 @@ const render=require('./render-utils');
 const publisher=require('./git-publisher');
 const media=require('./media-publisher');
 const mediaContent=require('./media-content');
-const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'bidirectional',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes',edgeExecutable:media.defaultEdge(),mediaPlatforms:['csdn','zhihu'],mediaAutoOpen:true,mediaWebsiteUrl:'https://honorliu.top'};
+const MEDIA_PLATFORMS={csdn:'CSDN',zhihu:'知乎',xiaohongshu:'小红书',douyin:'抖音图文'};
+const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'vault-to-web',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes',edgeExecutable:media.defaultEdge(),mediaPlatforms:['csdn','zhihu','xiaohongshu','douyin'],mediaAutoOpen:true,mediaWebsiteUrl:'https://honorliu.top'};
 const TODAY=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
 const readDoc=text=>core.parseDocument(text,parseYaml);
 const serialize=doc=>core.serialize(doc,stringifyYaml);
@@ -331,18 +332,18 @@ const publicMeta=meta=>Object.fromEntries(Object.entries(meta).filter(([key])=>!
 module.exports=class WebsiteNoteSync extends Plugin {
   async onload() {
     this.data=await this.loadData()||{};
-    this.settings={...DEFAULTS,...this.data.settings};
+    this.settings={...DEFAULTS,...this.data.settings,mediaPlatforms:[...(this.data.settings?.mediaPlatforms||DEFAULTS.mediaPlatforms)].filter(type=>MEDIA_PLATFORMS[type])};
     this.state=this.data.state||{};
     this.mediaBridge=new media.MediaBridge(async result=>{
       this.data.mediaHistory=[result,...(this.data.mediaHistory||[]).filter(item=>item.sourcePath!==result.sourcePath||item.platform!==result.platform)].slice(0,100);
-      await this.save();new Notice((result.platform==='csdn'?'CSDN':'知乎')+' 草稿已保存；请在 Edge 编辑页确认发布。',10000);
+      await this.save();new Notice((MEDIA_PLATFORMS[result.platform]||result.platform)+' 草稿已保存；请在 Edge 编辑页确认发布。',10000);
     });
-    this.addRibbonIcon('refresh-cw','预览并同步公开笔记',()=>this.preview());
-    this.addRibbonIcon('upload','预览并推送网站',()=>this.previewPush());
-    this.addRibbonIcon('send','将当前笔记发送到 CSDN / 知乎草稿',()=>this.previewMedia());
-    this.addCommand({id:'send-current-note-to-media',name:'将当前笔记发送到 CSDN / 知乎草稿',callback:()=>this.previewMedia()});
+    this.addRibbonIcon('layers','打开同步中心',()=>new SyncCenter(this.app,this).open());
+    this.addCommand({id:'send-current-note-to-media',name:'将当前笔记发送到媒体平台草稿',callback:()=>this.previewMedia()});
     this.addCommand({id:'draft-current-note-csdn',name:'将当前笔记发送到 CSDN 草稿',callback:()=>this.previewMedia(['csdn'])});
     this.addCommand({id:'draft-current-note-zhihu',name:'将当前笔记发送到知乎草稿',callback:()=>this.previewMedia(['zhihu'])});
+    this.addCommand({id:'draft-current-note-xiaohongshu',name:'将当前笔记发送到小红书草稿',callback:()=>this.previewMedia(['xiaohongshu'])});
+    this.addCommand({id:'draft-current-note-douyin',name:'将当前笔记发送到抖音图文草稿',callback:()=>this.previewMedia(['douyin'])});
     this.addCommand({id:'push-website',name:'预览改动并推送网站到 GitHub',callback:()=>this.previewPush()});
     this.addCommand({id:'sync-public-notes',name:'预览并同步公开笔记',callback:()=>this.preview()});
     this.addCommand({id:'sync-current-note',name:'预览并同步当前笔记',callback:()=>{
@@ -698,19 +699,32 @@ module.exports=class WebsiteNoteSync extends Plugin {
   }
 };
 
+class SyncCenter extends Modal {
+  constructor(app,plugin){super(app);this.plugin=plugin;}
+  onOpen(){
+    const el=this.contentEl;el.createEl('h2',{text:'同步中心'});
+    el.createEl('p',{text:'选择当前要执行的操作。所有动作都需要你在预览窗口确认；媒体平台只生成草稿，不会自动公开发布。'});
+    new Setting(el).setName('同步公开笔记').setDesc('按当前同步模式预览并同步 Obsidian 与网站。').addButton(button=>button.setButtonText('打开').setCta().onClick(()=>{this.close();this.plugin.preview();}));
+    new Setting(el).setName('推送网站').setDesc('预览网站仓库改动，提交并推送到 GitHub。').addButton(button=>button.setButtonText('打开').onClick(()=>{this.close();this.plugin.previewPush();}));
+    new Setting(el).setName('生成媒体草稿').setDesc('将当前笔记发送到 CSDN、知乎、小红书或抖音图文。').addButton(button=>button.setButtonText('选择平台').onClick(()=>{this.close();this.plugin.previewMedia();}));
+    new Setting(el).setName('补充笔记属性').setDesc('为当前笔记补充 title、date、domain、tags 等发布字段。').addButton(button=>button.setButtonText('执行').onClick(()=>{this.close();this.plugin.prepareCurrentNote();}));
+  }
+  onClose(){this.contentEl.empty();}
+}
+
 class MediaPreview extends Modal {
   constructor(app,plugin,file,platforms){super(app);this.plugin=plugin;this.file=file;this.platforms=new Set(platforms||[]);}
   onOpen(){
     const el=this.contentEl;el.createEl('h2',{text:'发送到媒体草稿'});
     el.createEl('p',{text:this.file.basename});
     el.createEl('p',{text:'发送当前笔记的标题、正文和图片，无需 publish 属性，也不带网站分类。下一步在 Edge 检查登录和正文，再生成草稿；最终发布由你确认。'});
-    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎']])new Setting(el).setName(name).addToggle(toggle=>toggle.setValue(this.platforms.has(type)).onChange(value=>{if(value)this.platforms.add(type);else this.platforms.delete(type);}));
+    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎'],['xiaohongshu','小红书'],['douyin','抖音图文']])new Setting(el).setName(name).addToggle(toggle=>toggle.setValue(this.platforms.has(type)).onChange(value=>{if(value)this.platforms.add(type);else this.platforms.delete(type);}));
     const history=(this.plugin.data.mediaHistory||[]).filter(item=>item.sourcePath===this.file.path);
     if(history.length){
       el.createEl('p',{text:'这篇笔记已有草稿记录。再次发送会新建草稿；修改已有草稿请打开下方编辑页。'});
-      for(const item of history)new Setting(el).setName((item.platform==='csdn'?'CSDN':'知乎')+' · '+new Date(item.time).toLocaleString()).addButton(button=>button.setButtonText('打开已有草稿').onClick(async()=>{try{await media.openEdge(this.plugin.settings.edgeExecutable,item.url);}catch(error){new Notice(error.message);}}));
+      for(const item of history)new Setting(el).setName(({csdn:'CSDN',zhihu:'知乎',xiaohongshu:'小红书',douyin:'抖音图文'}[item.platform]||item.platform)+' · '+new Date(item.time).toLocaleString()).addButton(button=>button.setButtonText('打开已有草稿').onClick(async()=>{try{await media.openEdge(this.plugin.settings.edgeExecutable,item.url);}catch(error){new Notice(error.message);}}));
     }
-    el.createEl('p',{text:'首次使用请在常用 Edge 中安装“文章同步助手”，并登录所选平台。CSDN 保留 LaTeX；知乎公式转成图片。两平台使用自己的正文排版。'});
+    el.createEl('p',{text:'首次使用请在常用 Edge 中安装“文章同步助手”，并登录所选平台。CSDN 保留 LaTeX；知乎公式转成图片；小红书和抖音图文会去掉 Markdown、代码块和公式，只发送纯文本与图片。'});
     const status=el.createEl('p');
     new Setting(el).addButton(button=>button.setButtonText('在 Edge 检查并发送').setCta().onClick(async()=>{
       button.setDisabled(true);status.textContent='正在准备正文和图片…';
@@ -814,14 +828,14 @@ class SyncSettings extends PluginSettingTab {
     new Setting(this.containerEl).setName('Git 远程名称').setDesc('默认 origin，推送当前所在分支。').addText(text=>text.setValue(this.plugin.settings.gitRemote).onChange(async value=>{this.plugin.settings.gitRemote=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('默认提交说明').addText(text=>text.setValue(this.plugin.settings.commitMessage).onChange(async value=>{this.plugin.settings.commitMessage=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('手动发布网站').setDesc('也可点击左侧上传图标，或运行“预览改动并推送网站到 GitHub”。').addButton(button=>button.setButtonText('预览改动并推送').onClick(()=>this.plugin.previewPush()));
-    this.containerEl.createEl('h3',{text:'CSDN / 知乎草稿'});
-    this.containerEl.createEl('p',{text:'通过 Edge 的“文章同步助手”扩展保存草稿；只发送当前笔记，不依赖网站同步方向或公开属性。公开发布请在平台编辑页确认。'});
-    this.containerEl.createEl('a',{text:'安装 / 更新文章同步助手',href:'https://wechatsync.com/#install'});
+    this.containerEl.createEl('h3',{text:'媒体平台草稿'});
+    this.containerEl.createEl('p',{text:'通过 Edge 的“文章同步助手”扩展保存草稿；只发送当前笔记，不依赖网站同步方向或公开属性。登录状态保存在 Edge，不会写入 Obsidian 配置。公开发布请在平台编辑页确认。'});
+    const install=this.containerEl.createEl('a',{text:'安装 / 更新文章同步助手',href:'https://wechatsync.com/#install'});install.target='_blank';install.rel='noopener noreferrer';
     new Setting(this.containerEl).setName('Microsoft Edge 程序路径').setDesc('使用平时登录平台的 Edge 个人资料。插件不读取或保存密码、Cookie。').addText(text=>text.setValue(this.plugin.settings.edgeExecutable).onChange(async value=>{this.plugin.settings.edgeExecutable=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('个人网站公开网址').setDesc('将笔记中的公开内部链接转换成完整网址；私有笔记链接仅保留文字。').addText(text=>text.setValue(this.plugin.settings.mediaWebsiteUrl).onChange(async value=>{this.plugin.settings.mediaWebsiteUrl=value;await this.plugin.save();}));
-    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎']])new Setting(this.containerEl).setName('默认选择 '+name).addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaPlatforms.includes(type)).onChange(async value=>{const selected=new Set(this.plugin.settings.mediaPlatforms);if(value)selected.add(type);else selected.delete(type);this.plugin.settings.mediaPlatforms=[...selected];await this.plugin.save();}));
+    for(const [type,name]of Object.entries(MEDIA_PLATFORMS))new Setting(this.containerEl).setName('默认选择 '+name).setDesc(type==='xiaohongshu'?'正文上限约 10000 字。':type==='douyin'?'图文正文上限约 8000 字。':'').addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaPlatforms.includes(type)).onChange(async value=>{const selected=new Set(this.plugin.settings.mediaPlatforms);if(value)selected.add(type);else selected.delete(type);if(!selected.size){new Notice('至少保留一个媒体平台。');toggle.setValue(true);return;}this.plugin.settings.mediaPlatforms=[...selected];await this.plugin.save();}));
     new Setting(this.containerEl).setName('保存草稿后打开编辑页').setDesc('Edge 拦截弹出窗口时，点击结果中的“打开编辑页并确认发布”。').addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaAutoOpen).onChange(async value=>{this.plugin.settings.mediaAutoOpen=value;await this.plugin.save();}));
-    new Setting(this.containerEl).setName('发送当前笔记').setDesc('也可以点击左侧纸飞机图标，或运行“将当前笔记发送到 CSDN / 知乎草稿”。').addButton(button=>button.setButtonText('选择平台并预览').onClick(()=>this.plugin.previewMedia()));
+    new Setting(this.containerEl).setName('发送当前笔记').setDesc('也可以点击左侧纸飞机图标，或运行“将当前笔记发送到媒体平台草稿”。小红书正文上限 10000 字，抖音图文正文上限 8000 字。').addButton(button=>button.setButtonText('选择平台并预览').onClick(()=>this.plugin.previewMedia()));
     this.containerEl.createEl('h3',{text:'新文章与笔记属性'});
     this.containerEl.createEl('p',{text:'在新笔记运行 Templater: Open Insert Template modal，选择 website-note；或使用下方按钮给当前笔记补充属性。写好后勾选 publish，设置 domain 和 tags，再预览同步。'});
     new Setting(this.containerEl).setName('当前笔记发布属性').setDesc('只补充缺失字段，不会将草稿自动公开。').addButton(button=>button.setButtonText('补充属性').onClick(()=>this.plugin.prepareCurrentNote()));
@@ -831,7 +845,7 @@ class SyncSettings extends PluginSettingTab {
 }
 
 },
-'./media-content': function(module,exports,require){
+"./media-content": function(module,exports,require){
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os');
 const core=require('./sync-core');
@@ -886,6 +900,19 @@ async function formulaImage(latex,display){
   return 'data:image/svg+xml;base64,'+Buffer.from(svgText).toString('base64');
 }
 
+function socialPost(root,maxImages){
+  const source=root.cloneNode(true);
+  source.querySelectorAll('script,style,iframe,object,embed,form,input,button,textarea,select,link,meta').forEach(node=>node.remove());
+  source.querySelectorAll('.math-inline,.math-display').forEach(node=>node.replaceWith(document.createTextNode('[公式已省略]')));
+  const images=[...source.querySelectorAll('img')].slice(0,maxImages).map(image=>image.getAttribute('src')).filter(Boolean);
+  source.querySelectorAll('img').forEach(image=>image.remove());
+  source.querySelectorAll('pre,table,svg,canvas').forEach(node=>node.replaceWith(document.createTextNode(node.textContent||'')));
+  const text=(source.textContent||'').replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  const paragraphs=text.split(/\n+/).map(line=>line.trim()).filter(Boolean).map(line=>'<p>'+String(line).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</p>');
+  const imageMarkup=images.map(src=>'<p><img src="'+String(src).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" alt=""></p>');
+  return {content:paragraphs.concat(imageMarkup).join(''),text,images};
+}
+
 async function prepareArticle(plugin,file){
   const {parseYaml}=require('obsidian'),doc=core.parseDocument(await plugin.app.vault.read(file),parseYaml);
   if(!doc.body.trim())throw new Error('当前笔记没有正文。');
@@ -934,9 +961,15 @@ async function prepareArticle(plugin,file){
       const image=document.createElement('img');image.src=await formulaImage(latex,display);image.alt=latex;
       if(display){const paragraph=document.createElement('p');paragraph.append(image);math.replaceWith(paragraph);}else math.replaceWith(image);
     }
+    const xiaohongshu=socialPost(root,3),douyin=socialPost(root,9);
     const article={title:String(doc.meta.title||file.basename),sourcePath:file.path,fingerprint:core.hash(doc.body),
-      posts:{csdn:{title:String(doc.meta.title||file.basename),content:csdn,markdown:markdownBody},zhihu:{title:String(doc.meta.title||file.basename),content:zhihu.innerHTML}},
+      posts:{csdn:{title:String(doc.meta.title||file.basename),content:csdn,markdown:markdownBody},zhihu:{title:String(doc.meta.title||file.basename),content:zhihu.innerHTML},xiaohongshu:{title:String(doc.meta.title||file.basename),content:xiaohongshu.content,plainText:xiaohongshu.text,markdown:''},douyin:{title:String(doc.meta.title||file.basename),content:douyin.content,plainText:douyin.text,markdown:''}},
       images:root.querySelectorAll('img').length,formulas:(rendered.html.match(/class="math-(?:inline|display)"/g)||[]).length};
+    const limits={xiaohongshu:10000,douyin:8000};
+    for(const [platform,limit] of Object.entries(limits)){
+      const text=article.posts[platform].plainText||'';
+      if([...text].length>limit)throw new Error((platform==='xiaohongshu'?'小红书':'抖音图文')+'正文超过 '+limit+' 字，请拆分笔记后重试。');
+    }
     if(Buffer.byteLength(JSON.stringify(article))>40*1024*1024)throw new Error('本次正文和图片超过 40 MB，请拆分笔记或压缩图片。');
     return article;
   }finally{fs.rmSync(temporary,{recursive:true,force:true});}
@@ -944,20 +977,20 @@ async function prepareArticle(plugin,file){
 module.exports={prepareArticle,markdown,formulaImage};
 
 },
-'./media-page': function(module,exports,require){
+"./media-page": function(module,exports,require){
 'use strict';
 const {escapeHtml}=require('./render-utils');
 
 // Runs inside the user's normal Edge profile, where the extension and logins live.
 function browserMain(payload){
-  const names={csdn:'CSDN',zhihu:'知乎'},status=document.querySelector('#status'),send=document.querySelector('#send'),refresh=document.querySelector('#refresh');
+  const names={csdn:'CSDN',zhihu:'知乎',xiaohongshu:'小红书',douyin:'抖音图文'},status=document.querySelector('#status'),send=document.querySelector('#send'),refresh=document.querySelector('#refresh');
   let accounts=[],busy=false,expired=false,checking=false;
   const saved=new Set(Object.keys(payload.results||{})),inFlight=new Set();
   const text=(id,value)=>{document.querySelector('#'+id).textContent=value;};
   const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   const sdk=()=>window.$syncer||window.$poster;
   const safeUrl=(type,value)=>{
-    try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(type==='csdn'?url.hostname==='editor.csdn.net':url.hostname==='zhuanlan.zhihu.com')?url.href:null;}catch{return null;}
+    try{const url=new URL(value),hosts={csdn:'editor.csdn.net',zhihu:'zhuanlan.zhihu.com',xiaohongshu:'creator.xiaohongshu.com',douyin:'creator.douyin.com'};return url.protocol==='https:'&&!url.username&&!url.password&&url.hostname===hosts[type]?url.href:null;}catch{return null;}
   };
   // Both old and new SDK callbacks deliver their result as the first argument.
   function call(method,arg,timeout=60000){return new Promise((resolve,reject)=>{
@@ -982,7 +1015,9 @@ function browserMain(payload){
   }
   async function uploadImages(post,account){
     const copy={...post},tree=document.createElement('div');tree.innerHTML=copy.content;
-    const sources=[...new Set([...tree.querySelectorAll('img')].map(img=>img.getAttribute('src')).filter(Boolean))];
+    const htmlSources=[...tree.querySelectorAll('img')].map(img=>img.getAttribute('src')).filter(Boolean);
+    const markdownSources=copy.markdown?[...copy.markdown.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(match=>match[1]):[];
+    const sources=[...new Set([...htmlSources,...markdownSources])];
     for(let i=0;i<sources.length;i++){
       const source=sources[i];text(account.type+'-progress','上传图片 '+(i+1)+' / '+sources.length);
       const result=await call('uploadImage',{src:source,account},120000),url=result?.result?.url||result?.url;
@@ -1055,22 +1090,23 @@ function browserMain(payload){
 }
 
 function page(payload,nonce){
+  const names={csdn:'CSDN',zhihu:'知乎',xiaohongshu:'小红书',douyin:'抖音图文'};
   const json=JSON.stringify(payload).replace(/</g,'\\u003c');
   return `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>发送笔记草稿</title>
   <style>body{margin:0;background:#f4f6fa;color:#202c3c;font:16px/1.65 system-ui,"Microsoft YaHei",sans-serif}main{max-width:960px;margin:32px auto;padding:28px;background:white;border:1px solid #dce3ec;border-radius:16px}h1{font-size:26px;margin:0 0 8px}h2{font-size:21px}p{margin:8px 0 16px}.hint{color:#536174}.platform{padding:16px;border:1px solid #dce3ec;border-radius:10px;margin:12px 0}.platform label{font-size:18px;font-weight:600}.account,.progress{display:block;margin-top:6px;overflow-wrap:anywhere}.account{color:#536174;font-size:14px}button{padding:11px 18px;font:inherit;border:1px solid #b9c9e4;border-radius:8px;cursor:pointer;background:#eff4fc;color:#173a75;margin:8px 8px 8px 0}button.primary{background:#245dc1;color:white}button:disabled{opacity:.55;cursor:default}a{color:#1852ad}#status{padding:14px;background:#edf3fc;border-radius:8px}#preview{padding:20px;border:1px solid #dce3ec;overflow-wrap:anywhere}#preview img{max-width:100%;height:auto;vertical-align:middle}#preview pre{overflow:auto;background:#f3f5f8;padding:14px}#preview table{border-collapse:collapse}#preview td,#preview th{border:1px solid #ccd4df;padding:6px 10px}@media(max-width:640px){main{margin:0;padding:18px;border-radius:0}}</style>
   <main><h1>发送笔记草稿</h1><p class="hint">使用当前 Edge 个人资料的登录状态。仅发送标题、正文和图片；网站分类与笔记属性不会发送。最终公开发布由你在平台确认。</p>
-  <p><a href="https://wechatsync.com/#install" target="_blank" rel="noopener noreferrer">安装 / 更新文章同步助手</a> · <a href="https://editor.csdn.net/md/" target="_blank" rel="noopener noreferrer">登录 CSDN</a> · <a href="https://www.zhihu.com/" target="_blank" rel="noopener noreferrer">登录知乎</a></p>
+  <p><a href="https://wechatsync.com/#install" target="_blank" rel="noopener noreferrer">安装 / 更新文章同步助手</a> · <a href="https://editor.csdn.net/md/" target="_blank" rel="noopener noreferrer">登录 CSDN</a> · <a href="https://www.zhihu.com/" target="_blank" rel="noopener noreferrer">登录知乎</a> · <a href="https://creator.xiaohongshu.com/" target="_blank" rel="noopener noreferrer">登录小红书</a> · <a href="https://creator.douyin.com/" target="_blank" rel="noopener noreferrer">登录抖音</a></p>
   <div id="status" role="status" aria-live="polite">正在准备…</div>
-  ${['csdn','zhihu'].map(type=>`<div class="platform"><label><input type="checkbox" id="${type}" disabled> ${type==='csdn'?'CSDN':'知乎'}</label><span id="${type}-account" class="account"></span><span id="${type}-progress" class="progress" aria-live="polite"></span><div id="${type}-result"></div></div>`).join('')}
+  ${Object.entries(names).map(([type,name])=>`<div class="platform"><label><input type="checkbox" id="${type}" disabled> ${name}</label><span id="${type}-account" class="account"></span><span id="${type}-progress" class="progress" aria-live="polite"></span><div id="${type}-result"></div></div>`).join('')}
   <button id="refresh">重新检测登录</button><button id="send" class="primary" disabled>生成所选平台草稿</button>
-  <p class="hint">图片会逐张上传，失败时停止该平台的草稿创建。每次发送会新建草稿；结果超时请先检查草稿箱。CSDN 保留 LaTeX，知乎公式以图片显示。平台排版以编辑页为准。</p>
+  <p class="hint">图片会逐张上传，失败时停止该平台的草稿创建。每次发送会新建草稿；结果超时请先检查草稿箱。CSDN 保留 LaTeX，知乎公式以图片显示；小红书和抖音图文只发送纯文本与图片，Markdown、代码块和公式会被移除。平台排版以编辑页为准。</p>
   <h2 id="article-title">${escapeHtml(payload.article.title)}</h2><details open><summary>发送内容预览（本机）</summary><article id="preview"></article></details></main>
   <script nonce="${nonce}">(${browserMain.toString()})(${json});</script></html>`;
 }
 module.exports={page,browserMain};
 
 },
-'./media-publisher': function(module,exports,require){
+"./media-publisher": function(module,exports,require){
 'use strict';
 const fs=require('fs'),path=require('path'),http=require('http'),crypto=require('crypto');
 const {spawn}=require('child_process');
@@ -1087,7 +1123,7 @@ function openEdge(executable,url){
   });
 }
 function draftUrl(platform,value){
-  try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(platform==='csdn'?url.hostname==='editor.csdn.net':platform==='zhihu'&&url.hostname==='zhuanlan.zhihu.com')?url.href:null;}catch{return null;}
+  try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(({csdn:'editor.csdn.net',zhihu:'zhuanlan.zhihu.com',xiaohongshu:'creator.xiaohongshu.com',douyin:'creator.douyin.com'}[platform]===url.hostname))?url.href:null;}catch{return null;}
 }
 class MediaBridge{
   constructor(onResult){this.sessions=new Map();this.onResult=onResult;}
@@ -1103,7 +1139,7 @@ class MediaBridge{
     await this.start();
     if(this.sessions.size>=8)throw new Error('已有多个发送窗口，请关闭后重新启用插件再试。');
     const token=crypto.randomBytes(24).toString('hex');
-    this.sessions.set(token,{article,platforms:['csdn','zhihu'].filter(type=>settings.mediaPlatforms?.includes(type)),autoOpen:settings.mediaAutoOpen!==false,expires:Date.now()+TTL,results:{}});
+    this.sessions.set(token,{article,platforms:['csdn','zhihu','xiaohongshu','douyin'].filter(type=>settings.mediaPlatforms?.includes(type)),autoOpen:settings.mediaAutoOpen!==false,expires:Date.now()+TTL,results:{}});
     return this.origin+'/'+token+'/';
   }
   async handle(req,res){
@@ -1137,4 +1173,4 @@ module.exports={MediaBridge,defaultEdge,openEdge,draftUrl};
 };
 const cache={};
 function load(name){if(!modules[name])return nativeRequire(name);if(!cache[name]){const part={exports:{}};cache[name]=part;modules[name](part,part.exports,load);}return cache[name].exports;}
-module.exports=load("./main");
+module.exports=load('./main');

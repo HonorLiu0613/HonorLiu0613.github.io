@@ -2,7 +2,7 @@
 <p dir="auto">PX4 使用 <code>uXRCE-DDS</code> 中间件，允许 <code>uORB</code> 消息像 <code>ROS 2</code> 主题一样在配套计算机上发布和订阅。这为 PX4 与 ROS 2 之间提供了快速且可靠的集成，使 ROS 2 应用获取车辆信息和发送命令变得更加便捷。</p>
 <p dir="auto">PX4 采用 <code>XRCE-DDS</code> 实现，利用 <code>eProsima Micro XRCE-DDS</code>。</p>
 <p dir="auto">代理端(Agent)充当客户端的代理，使其能够在DDS全局数据空间中发布和订阅话题。</p>
-<p dir="auto"><img width="700" alt="Architecture uXRCE-DDS with ROS 2" src="https://docs.px4.io/v1.17/assets/architecture_xrce-dds_ros2.CpY9H3P9.svg" referrerpolicy="no-referrer"></p>
+<p dir="auto"><img src="https://docs.px4.io/v1.17/assets/architecture_xrce-dds_ros2.CpY9H3P9.svg" alt="Architecture uXRCE-DDS with ROS 2" width="700" referrerpolicy="no-referrer"></p>
 <p dir="auto"><code>uXRCE-DDS 中间件</code>由运行在 <code>PX4</code> 上的客户端和运行在伴随计算机上的代理组成，两者之间通过串口或 <code>UDP</code> 链路实现双向数据交换。代理作为客户端的代理，使其能够发布和订阅全球 DDS 数据空间中的主题。</p>
 <p dir="auto"><em>相关笔记</em>：<span class="unpublished-link">3. UDP与TCP协议</span></p>
 <h2 data-heading="代码构建" dir="auto" id="代码构建">代码构建</h2>
@@ -22,17 +22,17 @@ cmake <span class="token punctuation">..</span>
 <p dir="auto">例如，<code>PX4</code> 模拟器通过 <code>UDP</code> 协议在端口 <code>8888</code> 运行 <code>uXRCE-DDS</code> 客户端。因此，要连接到模拟器，可以使用以下命令启动代理程序：</p>
 <pre class="language-sh"><code class="language-sh is-loaded">MicroXRCEAgent udp4 <span class="token parameter variable">-p</span> <span class="token number">8888</span>
 </code></pre>
-<p dir="auto">在处理实际硬件时，设置会根据硬件、操作系统和通信通道而有所不同。例如，如果你使用的是 RPi <code>UART0</code> 串行端口，那么连接方式可以参考(<a data-tooltip-position="top" aria-label="https://www.raspberrypi.com/documentation/computers/configuration.html#configuring-uarts" rel="noopener nofollow" class="external-link" href="https://www.raspberrypi.com/documentation/computers/configuration.html#configuring-uarts" target="_blank">Raspberry Pi Documentation &gt; Configuring UARTS</a>中关于配置 UARTS 的部分说明。</p>
+<p dir="auto">在处理实际硬件时，设置会根据硬件、操作系统和通信通道而有所不同。例如，如果你使用的是 RPi <code>UART0</code> 串行端口，那么连接方式可以参考(<a href="https://www.raspberrypi.com/documentation/computers/configuration.html#configuring-uarts" class="external-link" rel="noopener nofollow" aria-label="https://www.raspberrypi.com/documentation/computers/configuration.html#configuring-uarts" data-tooltip-position="top" target="_blank">Raspberry Pi Documentation &gt; Configuring UARTS</a>中关于配置 UARTS 的部分说明。</p>
 <pre class="language-sh"><code class="language-sh is-loaded"><span class="token function">sudo</span> MicroXRCEAgent serial <span class="token parameter variable">--dev</span> /dev/AMA0 <span class="token parameter variable">-b</span> <span class="token number">921600</span>
 </code></pre>
 <h2 data-heading="## 支持的 uORB 消息" dir="auto" id="-支持的-uorb-消息">## 支持的 uORB 消息</h2>
 <p dir="auto">通过客户端可以访问的 <code>PX4 uORB</code> 主题集合定义在 <code>dds_topics.yaml</code> 文件中。</p>
 <p dir="auto">请注意，<code>ROS 2/DDS</code> 需要使用与在 <code>PX4</code> 固件中创建 <code>uXRCE-DDS</code> 客户端模块时相同的消息定义，这样才能正确解析这些消息。这些消息定义存储于 <code>ROS 2</code> 接口包 <code>PX4/px4_msgs</code> 中，并且会通过 CI 在 <code>main</code> 和 release 分支上进行自动同步。此外，<code>PX4</code> 源代码中的所有消息都存在于该代码仓库中，但只有 <code>dds_topics.yaml</code> 文件中列出的消息才会作为 <code>ROS 2</code> 话题使用。因此，请确保使用正确的消息进行通信。</p>
 <ul>
-<li dir="auto">如果您正在使用 PX4 的主要版本或发布版本，您可以通过克隆接口包<a data-tooltip-position="top" aria-label="https://github.com/PX4/px4_msgs" rel="noopener nofollow" class="external-link" href="https://github.com/PX4/px4_msgs" target="_blank">PX4/px4_msgs</a>获得消息定义。</li>
+<li dir="auto">如果您正在使用 PX4 的主要版本或发布版本，您可以通过克隆接口包<a href="https://github.com/PX4/px4_msgs" class="external-link" rel="noopener nofollow" aria-label="https://github.com/PX4/px4_msgs" data-tooltip-position="top" target="_blank">PX4/px4_msgs</a>获得消息定义。</li>
 <li dir="auto">查看可用话题。</li>
 </ul>
 <pre class="language-sh"><code class="language-sh is-loaded">ros2 topic list <span class="token parameter variable">-t</span> 
 </code></pre>
 <h2 data-heading="参考资料" dir="auto" id="参考资料">参考资料</h2>
-<p dir="auto"><a data-tooltip-position="top" aria-label="https://docs.px4.io/v1.17/zh/middleware/uxrce_dds" rel="noopener nofollow" class="external-link" href="https://docs.px4.io/v1.17/zh/middleware/uxrce_dds" target="_blank">入门指南 | PX4 Guide (v1.17)</a></p>
+<p dir="auto"><a href="https://docs.px4.io/v1.17/zh/middleware/uxrce_dds" class="external-link" rel="noopener nofollow" aria-label="https://docs.px4.io/v1.17/zh/middleware/uxrce_dds" data-tooltip-position="top" target="_blank">入门指南 | PX4 Guide (v1.17)</a></p>

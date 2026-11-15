@@ -2,7 +2,7 @@
 title: Kalman Filter Derivation
 excerpt: This is a Derivation to kalman filter.
 date: 2026-08-29
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: Control & Estimation
 tags:
@@ -13,7 +13,7 @@ redirect_from:
   - /portfolio/2026-08-29-Derivation-to-kalman-filter/
 web_id: kalman-filter-derivation
 web_slug: kalman-filter-derivation
-修改时间: 2026-11-14 20:42:01
+修改时间: 2026-11-14 21:15:31
 rendered_body: rendered-notes/kalman-filter-derivation.html
 rendered_source_hash: 0d439792f5bc222fa536a224e825f46cc43c053b47be15d9ef4d11eb17d0ac24
 source_vault_path: 02-知识笔记/3. 控制与估计/1. 卡尔曼滤波 kalman-filter-derivation.md

@@ -3,13 +3,13 @@
 领域: ROS2
 状态: 学习中
 创建时间: 2026-11-14 15:51
-修改时间: 2026-11-14 20:44:35
+修改时间: 2026-11-14 21:15:20
 tags:
   - 领域
   - ROS2
 title: 环境搭建 PX4 v1.17.0  Ubuntu22.04
 date: 2026-11-14
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: ROS2
 featured: false

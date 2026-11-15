@@ -3,15 +3,15 @@
 领域: ROS2
 状态: 学习中
 创建时间: 2026-11-14 16:19
-修改时间: 2026-11-14 20:42:08
+修改时间: 2026-11-15 11:50:26
 tags:
   - ROS2
 title: 桥接器 uXRCE-DDS中间件
 date: 2026-11-14
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: ROS2
-featured: false
+featured: true
 excerpt: PX4 使用 uXRCE-DDS 中间件，允许 uORB 消息像 ROS 2 主题一样在配套计算机上发布和订阅。这为 PX4 与 ROS 2 之间提供了快速且可靠的集成，使 ROS 2 应用获取车辆信息和发送命令变得更加便捷。
 web_slug: micro-xrce-dds-bridge
 web_id: micro-xrce-dds-bridge

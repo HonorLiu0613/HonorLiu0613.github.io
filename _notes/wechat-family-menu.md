@@ -2,7 +2,7 @@
 title: 暖灶记：把一家人的晚餐，变成一场温柔的共同决定
 excerpt: 一款为家庭设计的微信小程序点菜本，让每个人都能参与今天吃什么，让下厨的人少一点猜测，让一顿饭多一点期待。
 date: 2026-10-23
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: Software
 tags:
@@ -13,7 +13,7 @@ redirect_from:
   - /portfolio/2026-10-13-micro_program_on_wechat/
 web_id: wechat-family-menu
 web_slug: wechat-family-menu
-修改时间: 2026-11-14 20:37:07
+修改时间: 2026-11-14 21:15:44
 rendered_body: rendered-notes/wechat-family-menu.html
 rendered_source_hash: 9c1b6f3924c3f59c7d2254778b5779b997f27606a8afbab579fe0eab9989b76b
 source_vault_path: 04-项目实验/2. 微信小程序/wechat-family-menu.md

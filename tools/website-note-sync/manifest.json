@@ -1,9 +1,9 @@
 {
   "id": "website-note-sync",
   "name": "Website Note Sync",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "minAppVersion": "1.6.0",
-  "description": "Sync public notes with a local website, push to GitHub, and send current-note drafts to CSDN or Zhihu through Microsoft Edge and Wechatsync.",
+  "description": "Sync public notes with a local website, push to GitHub, and create drafts for CSDN, Zhihu, Xiaohongshu, and Douyin through Microsoft Edge and Wechatsync.",
   "author": "Haoran Liu",
   "isDesktopOnly": true
 }

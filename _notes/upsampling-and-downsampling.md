@@ -3,12 +3,12 @@
 领域: 深度学习
 状态: 学习中
 创建时间: 2026-11-12 15:01
-修改时间: 2026-11-14 20:37:02
+修改时间: 2026-11-14 21:15:21
 tags:
   - 领域/深度学习
 title: 上采样与下采样 UpSample DownSample
 date: 2026-11-12
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: 深度学习
 featured: false

@@ -2,7 +2,7 @@
 title: Building My Personal Website
 excerpt: based on Jekyll and GitHub Pages
 date: 2026-08-01
-updated: 2026-11-14
+updated: 2026-11-15
 publish: true
 domain: Software
 tags:
@@ -12,7 +12,7 @@ redirect_from:
   - /portfolio/2026-08-01-website-project/
 web_id: personal-website
 web_slug: personal-website
-修改时间: 2026-11-14 20:37:09
+修改时间: 2026-11-14 21:15:37
 rendered_body: rendered-notes/personal-website.html
 rendered_source_hash: 41e01bc63b299fdd88418442a2c164ff3885167015b1e888a08f0c037aa85519
 source_vault_path: 04-项目实验/1. 个人网站/personal-website.md
