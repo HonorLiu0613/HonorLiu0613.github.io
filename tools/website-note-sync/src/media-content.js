@@ -52,6 +52,19 @@ async function formulaImage(latex,display){
   return 'data:image/svg+xml;base64,'+Buffer.from(svgText).toString('base64');
 }
 
+function socialPost(root,maxImages){
+  const source=root.cloneNode(true);
+  source.querySelectorAll('script,style,iframe,object,embed,form,input,button,textarea,select,link,meta').forEach(node=>node.remove());
+  source.querySelectorAll('.math-inline,.math-display').forEach(node=>node.replaceWith(document.createTextNode('[公式已省略]')));
+  const images=[...source.querySelectorAll('img')].slice(0,maxImages).map(image=>image.getAttribute('src')).filter(Boolean);
+  source.querySelectorAll('img').forEach(image=>image.remove());
+  source.querySelectorAll('pre,table,svg,canvas').forEach(node=>node.replaceWith(document.createTextNode(node.textContent||'')));
+  const text=(source.textContent||'').replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  const paragraphs=text.split(/\n+/).map(line=>line.trim()).filter(Boolean).map(line=>'<p>'+String(line).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</p>');
+  const imageMarkup=images.map(src=>'<p><img src="'+String(src).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" alt=""></p>');
+  return {content:paragraphs.concat(imageMarkup).join(''),text,images};
+}
+
 async function prepareArticle(plugin,file){
   const {parseYaml}=require('obsidian'),doc=core.parseDocument(await plugin.app.vault.read(file),parseYaml);
   if(!doc.body.trim())throw new Error('当前笔记没有正文。');
@@ -100,9 +113,15 @@ async function prepareArticle(plugin,file){
       const image=document.createElement('img');image.src=await formulaImage(latex,display);image.alt=latex;
       if(display){const paragraph=document.createElement('p');paragraph.append(image);math.replaceWith(paragraph);}else math.replaceWith(image);
     }
+    const xiaohongshu=socialPost(root,3),douyin=socialPost(root,9);
     const article={title:String(doc.meta.title||file.basename),sourcePath:file.path,fingerprint:core.hash(doc.body),
-      posts:{csdn:{title:String(doc.meta.title||file.basename),content:csdn,markdown:markdownBody},zhihu:{title:String(doc.meta.title||file.basename),content:zhihu.innerHTML}},
+      posts:{csdn:{title:String(doc.meta.title||file.basename),content:csdn,markdown:markdownBody},zhihu:{title:String(doc.meta.title||file.basename),content:zhihu.innerHTML},xiaohongshu:{title:String(doc.meta.title||file.basename),content:xiaohongshu.content,plainText:xiaohongshu.text,markdown:''},douyin:{title:String(doc.meta.title||file.basename),content:douyin.content,plainText:douyin.text,markdown:''}},
       images:root.querySelectorAll('img').length,formulas:(rendered.html.match(/class="math-(?:inline|display)"/g)||[]).length};
+    const limits={xiaohongshu:10000,douyin:8000};
+    for(const [platform,limit] of Object.entries(limits)){
+      const text=article.posts[platform].plainText||'';
+      if([...text].length>limit)throw new Error((platform==='xiaohongshu'?'小红书':'抖音图文')+'正文超过 '+limit+' 字，请拆分笔记后重试。');
+    }
     if(Buffer.byteLength(JSON.stringify(article))>40*1024*1024)throw new Error('本次正文和图片超过 40 MB，请拆分笔记或压缩图片。');
     return article;
   }finally{fs.rmSync(temporary,{recursive:true,force:true});}

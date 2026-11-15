@@ -8,7 +8,8 @@ const render=require('./render-utils');
 const publisher=require('./git-publisher');
 const media=require('./media-publisher');
 const mediaContent=require('./media-content');
-const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'bidirectional',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes',edgeExecutable:media.defaultEdge(),mediaPlatforms:['csdn','zhihu'],mediaAutoOpen:true,mediaWebsiteUrl:'https://honorliu.top'};
+const MEDIA_PLATFORMS={csdn:'CSDN',zhihu:'知乎',xiaohongshu:'小红书',douyin:'抖音图文'};
+const DEFAULTS={websitePath:'',rubyExecutable:'',bundlePath:'',buildAfterSync:true,syncMode:'vault-to-web',protectTargetChanges:true,refreshBodyStyles:true,importFolder:'05-闲杂随记',gitExecutable:publisher.defaultExecutable(),gitRemote:'origin',openPushAfterSync:true,buildBeforePush:true,commitMessage:'Update public notes',edgeExecutable:media.defaultEdge(),mediaPlatforms:['csdn','zhihu','xiaohongshu','douyin'],mediaAutoOpen:true,mediaWebsiteUrl:'https://honorliu.top'};
 const TODAY=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
 const readDoc=text=>core.parseDocument(text,parseYaml);
 const serialize=doc=>core.serialize(doc,stringifyYaml);
@@ -17,18 +18,18 @@ const publicMeta=meta=>Object.fromEntries(Object.entries(meta).filter(([key])=>!
 module.exports=class WebsiteNoteSync extends Plugin {
   async onload() {
     this.data=await this.loadData()||{};
-    this.settings={...DEFAULTS,...this.data.settings};
+    this.settings={...DEFAULTS,...this.data.settings,mediaPlatforms:[...(this.data.settings?.mediaPlatforms||DEFAULTS.mediaPlatforms)].filter(type=>MEDIA_PLATFORMS[type])};
     this.state=this.data.state||{};
     this.mediaBridge=new media.MediaBridge(async result=>{
       this.data.mediaHistory=[result,...(this.data.mediaHistory||[]).filter(item=>item.sourcePath!==result.sourcePath||item.platform!==result.platform)].slice(0,100);
-      await this.save();new Notice((result.platform==='csdn'?'CSDN':'知乎')+' 草稿已保存；请在 Edge 编辑页确认发布。',10000);
+      await this.save();new Notice((MEDIA_PLATFORMS[result.platform]||result.platform)+' 草稿已保存；请在 Edge 编辑页确认发布。',10000);
     });
-    this.addRibbonIcon('refresh-cw','预览并同步公开笔记',()=>this.preview());
-    this.addRibbonIcon('upload','预览并推送网站',()=>this.previewPush());
-    this.addRibbonIcon('send','将当前笔记发送到 CSDN / 知乎草稿',()=>this.previewMedia());
-    this.addCommand({id:'send-current-note-to-media',name:'将当前笔记发送到 CSDN / 知乎草稿',callback:()=>this.previewMedia()});
+    this.addRibbonIcon('layers','打开同步中心',()=>new SyncCenter(this.app,this).open());
+    this.addCommand({id:'send-current-note-to-media',name:'将当前笔记发送到媒体平台草稿',callback:()=>this.previewMedia()});
     this.addCommand({id:'draft-current-note-csdn',name:'将当前笔记发送到 CSDN 草稿',callback:()=>this.previewMedia(['csdn'])});
     this.addCommand({id:'draft-current-note-zhihu',name:'将当前笔记发送到知乎草稿',callback:()=>this.previewMedia(['zhihu'])});
+    this.addCommand({id:'draft-current-note-xiaohongshu',name:'将当前笔记发送到小红书草稿',callback:()=>this.previewMedia(['xiaohongshu'])});
+    this.addCommand({id:'draft-current-note-douyin',name:'将当前笔记发送到抖音图文草稿',callback:()=>this.previewMedia(['douyin'])});
     this.addCommand({id:'push-website',name:'预览改动并推送网站到 GitHub',callback:()=>this.previewPush()});
     this.addCommand({id:'sync-public-notes',name:'预览并同步公开笔记',callback:()=>this.preview()});
     this.addCommand({id:'sync-current-note',name:'预览并同步当前笔记',callback:()=>{
@@ -384,19 +385,32 @@ module.exports=class WebsiteNoteSync extends Plugin {
   }
 };
 
+class SyncCenter extends Modal {
+  constructor(app,plugin){super(app);this.plugin=plugin;}
+  onOpen(){
+    const el=this.contentEl;el.createEl('h2',{text:'同步中心'});
+    el.createEl('p',{text:'选择当前要执行的操作。所有动作都需要你在预览窗口确认；媒体平台只生成草稿，不会自动公开发布。'});
+    new Setting(el).setName('同步公开笔记').setDesc('按当前同步模式预览并同步 Obsidian 与网站。').addButton(button=>button.setButtonText('打开').setCta().onClick(()=>{this.close();this.plugin.preview();}));
+    new Setting(el).setName('推送网站').setDesc('预览网站仓库改动，提交并推送到 GitHub。').addButton(button=>button.setButtonText('打开').onClick(()=>{this.close();this.plugin.previewPush();}));
+    new Setting(el).setName('生成媒体草稿').setDesc('将当前笔记发送到 CSDN、知乎、小红书或抖音图文。').addButton(button=>button.setButtonText('选择平台').onClick(()=>{this.close();this.plugin.previewMedia();}));
+    new Setting(el).setName('补充笔记属性').setDesc('为当前笔记补充 title、date、domain、tags 等发布字段。').addButton(button=>button.setButtonText('执行').onClick(()=>{this.close();this.plugin.prepareCurrentNote();}));
+  }
+  onClose(){this.contentEl.empty();}
+}
+
 class MediaPreview extends Modal {
   constructor(app,plugin,file,platforms){super(app);this.plugin=plugin;this.file=file;this.platforms=new Set(platforms||[]);}
   onOpen(){
     const el=this.contentEl;el.createEl('h2',{text:'发送到媒体草稿'});
     el.createEl('p',{text:this.file.basename});
     el.createEl('p',{text:'发送当前笔记的标题、正文和图片，无需 publish 属性，也不带网站分类。下一步在 Edge 检查登录和正文，再生成草稿；最终发布由你确认。'});
-    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎']])new Setting(el).setName(name).addToggle(toggle=>toggle.setValue(this.platforms.has(type)).onChange(value=>{if(value)this.platforms.add(type);else this.platforms.delete(type);}));
+    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎'],['xiaohongshu','小红书'],['douyin','抖音图文']])new Setting(el).setName(name).addToggle(toggle=>toggle.setValue(this.platforms.has(type)).onChange(value=>{if(value)this.platforms.add(type);else this.platforms.delete(type);}));
     const history=(this.plugin.data.mediaHistory||[]).filter(item=>item.sourcePath===this.file.path);
     if(history.length){
       el.createEl('p',{text:'这篇笔记已有草稿记录。再次发送会新建草稿；修改已有草稿请打开下方编辑页。'});
-      for(const item of history)new Setting(el).setName((item.platform==='csdn'?'CSDN':'知乎')+' · '+new Date(item.time).toLocaleString()).addButton(button=>button.setButtonText('打开已有草稿').onClick(async()=>{try{await media.openEdge(this.plugin.settings.edgeExecutable,item.url);}catch(error){new Notice(error.message);}}));
+      for(const item of history)new Setting(el).setName(({csdn:'CSDN',zhihu:'知乎',xiaohongshu:'小红书',douyin:'抖音图文'}[item.platform]||item.platform)+' · '+new Date(item.time).toLocaleString()).addButton(button=>button.setButtonText('打开已有草稿').onClick(async()=>{try{await media.openEdge(this.plugin.settings.edgeExecutable,item.url);}catch(error){new Notice(error.message);}}));
     }
-    el.createEl('p',{text:'首次使用请在常用 Edge 中安装“文章同步助手”，并登录所选平台。CSDN 保留 LaTeX；知乎公式转成图片。两平台使用自己的正文排版。'});
+    el.createEl('p',{text:'首次使用请在常用 Edge 中安装“文章同步助手”，并登录所选平台。CSDN 保留 LaTeX；知乎公式转成图片；小红书和抖音图文会去掉 Markdown、代码块和公式，只发送纯文本与图片。'});
     const status=el.createEl('p');
     new Setting(el).addButton(button=>button.setButtonText('在 Edge 检查并发送').setCta().onClick(async()=>{
       button.setDisabled(true);status.textContent='正在准备正文和图片…';
@@ -500,14 +514,14 @@ class SyncSettings extends PluginSettingTab {
     new Setting(this.containerEl).setName('Git 远程名称').setDesc('默认 origin，推送当前所在分支。').addText(text=>text.setValue(this.plugin.settings.gitRemote).onChange(async value=>{this.plugin.settings.gitRemote=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('默认提交说明').addText(text=>text.setValue(this.plugin.settings.commitMessage).onChange(async value=>{this.plugin.settings.commitMessage=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('手动发布网站').setDesc('也可点击左侧上传图标，或运行“预览改动并推送网站到 GitHub”。').addButton(button=>button.setButtonText('预览改动并推送').onClick(()=>this.plugin.previewPush()));
-    this.containerEl.createEl('h3',{text:'CSDN / 知乎草稿'});
-    this.containerEl.createEl('p',{text:'通过 Edge 的“文章同步助手”扩展保存草稿；只发送当前笔记，不依赖网站同步方向或公开属性。公开发布请在平台编辑页确认。'});
-    this.containerEl.createEl('a',{text:'安装 / 更新文章同步助手',href:'https://wechatsync.com/#install'});
+    this.containerEl.createEl('h3',{text:'媒体平台草稿'});
+    this.containerEl.createEl('p',{text:'通过 Edge 的“文章同步助手”扩展保存草稿；只发送当前笔记，不依赖网站同步方向或公开属性。登录状态保存在 Edge，不会写入 Obsidian 配置。公开发布请在平台编辑页确认。'});
+    const install=this.containerEl.createEl('a',{text:'安装 / 更新文章同步助手',href:'https://wechatsync.com/#install'});install.target='_blank';install.rel='noopener noreferrer';
     new Setting(this.containerEl).setName('Microsoft Edge 程序路径').setDesc('使用平时登录平台的 Edge 个人资料。插件不读取或保存密码、Cookie。').addText(text=>text.setValue(this.plugin.settings.edgeExecutable).onChange(async value=>{this.plugin.settings.edgeExecutable=value;await this.plugin.save();}));
     new Setting(this.containerEl).setName('个人网站公开网址').setDesc('将笔记中的公开内部链接转换成完整网址；私有笔记链接仅保留文字。').addText(text=>text.setValue(this.plugin.settings.mediaWebsiteUrl).onChange(async value=>{this.plugin.settings.mediaWebsiteUrl=value;await this.plugin.save();}));
-    for(const [type,name]of [['csdn','CSDN'],['zhihu','知乎']])new Setting(this.containerEl).setName('默认选择 '+name).addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaPlatforms.includes(type)).onChange(async value=>{const selected=new Set(this.plugin.settings.mediaPlatforms);if(value)selected.add(type);else selected.delete(type);this.plugin.settings.mediaPlatforms=[...selected];await this.plugin.save();}));
+    for(const [type,name]of Object.entries(MEDIA_PLATFORMS))new Setting(this.containerEl).setName('默认选择 '+name).setDesc(type==='xiaohongshu'?'正文上限约 10000 字。':type==='douyin'?'图文正文上限约 8000 字。':'').addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaPlatforms.includes(type)).onChange(async value=>{const selected=new Set(this.plugin.settings.mediaPlatforms);if(value)selected.add(type);else selected.delete(type);if(!selected.size){new Notice('至少保留一个媒体平台。');toggle.setValue(true);return;}this.plugin.settings.mediaPlatforms=[...selected];await this.plugin.save();}));
     new Setting(this.containerEl).setName('保存草稿后打开编辑页').setDesc('Edge 拦截弹出窗口时，点击结果中的“打开编辑页并确认发布”。').addToggle(toggle=>toggle.setValue(this.plugin.settings.mediaAutoOpen).onChange(async value=>{this.plugin.settings.mediaAutoOpen=value;await this.plugin.save();}));
-    new Setting(this.containerEl).setName('发送当前笔记').setDesc('也可以点击左侧纸飞机图标，或运行“将当前笔记发送到 CSDN / 知乎草稿”。').addButton(button=>button.setButtonText('选择平台并预览').onClick(()=>this.plugin.previewMedia()));
+    new Setting(this.containerEl).setName('发送当前笔记').setDesc('也可以点击左侧纸飞机图标，或运行“将当前笔记发送到媒体平台草稿”。小红书正文上限 10000 字，抖音图文正文上限 8000 字。').addButton(button=>button.setButtonText('选择平台并预览').onClick(()=>this.plugin.previewMedia()));
     this.containerEl.createEl('h3',{text:'新文章与笔记属性'});
     this.containerEl.createEl('p',{text:'在新笔记运行 Templater: Open Insert Template modal，选择 website-note；或使用下方按钮给当前笔记补充属性。写好后勾选 publish，设置 domain 和 tags，再预览同步。'});
     new Setting(this.containerEl).setName('当前笔记发布属性').setDesc('只补充缺失字段，不会将草稿自动公开。').addButton(button=>button.setButtonText('补充属性').onClick(()=>this.plugin.prepareCurrentNote()));

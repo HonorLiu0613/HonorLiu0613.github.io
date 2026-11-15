@@ -1,7 +1,7 @@
 'use strict';
 const nativeRequire=require;
 const modules={
-"./sync-core": function(module,exports,require){
+'./sync-core': function(module,exports,require){
 'use strict';
 const crypto = require('crypto');
 const path = require('path');
@@ -105,7 +105,7 @@ function classify(document, slug, fallbackFolder='05-闲杂随记') {
 module.exports = {hash,canonical,fingerprint,parseDocument,serialize,direction,inside,safeSlug,slugFromFile,classify,normalized,MANAGED,MODES,safeFolder,inferDomain};
 
 },
-"./border-snapshot": function(module,exports,require){
+'./border-snapshot': function(module,exports,require){
 'use strict';
 const FIXTURE = '<h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6><p>A paragraph with <strong>bold</strong>, <em>italic</em>, <code>inline code</code>, <a href="https://example.com">a link</a>, and <mark>highlight</mark>.</p><ul><li>First item</li><li>Second item<ul><li>Nested item</li></ul></li></ul><ol><li>Ordered item</li></ol><blockquote><p>A quoted paragraph.</p></blockquote><div class="callout" data-callout="note"><div class="callout-title"><div class="callout-title-inner">Note title</div></div><div class="callout-content"><p>Callout paragraph.</p></div></div><table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>One</td><td>Two</td></tr></tbody></table><pre><code class="language-python"><span class="token comment"># Comment</span> <span class="token keyword">def</span> <span class="token function">example</span><span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">hello</span></code></pre><hr>';
 const PROPS = ['color','background-color','font-family','font-size','font-weight','font-style','font-variant','line-height','letter-spacing','text-decoration-line','text-decoration-color','text-underline-offset','text-indent','margin-top','margin-bottom','padding-top','padding-right','padding-bottom','padding-left','border-top','border-right','border-bottom','border-left','border-radius','white-space','tab-size','list-style-type','border-collapse'];
@@ -163,7 +163,7 @@ function css(snapshot) {
 module.exports={capture,css,FIXTURE};
 
 },
-"./render-utils": function(module,exports,require){
+'./render-utils': function(module,exports,require){
 'use strict';
 const {hash} = require('./sync-core');
 const escapeHtml = value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -218,7 +218,7 @@ function restoreMath(html, math) {
 module.exports={escapeHtml,headingId,protectMath,restoreMath};
 
 },
-"./git-publisher": function(module,exports,require){
+'./git-publisher': function(module,exports,require){
 'use strict';
 const fs=require('fs');
 const path=require('path');
@@ -311,7 +311,7 @@ async function publish(root,settings,expected,message) {
 module.exports={defaultExecutable,redact,run,plan,publish,signature};
 
 },
-"./main": function(module,exports,require){
+'./main': function(module,exports,require){
 'use strict';
 const {Plugin,PluginSettingTab,Setting,Notice,Modal,MarkdownRenderer,Component,parseYaml,stringifyYaml}=require('obsidian');
 const fs=require('fs');
@@ -845,7 +845,7 @@ class SyncSettings extends PluginSettingTab {
 }
 
 },
-"./media-content": function(module,exports,require){
+'./media-content': function(module,exports,require){
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os');
 const core=require('./sync-core');
@@ -977,7 +977,7 @@ async function prepareArticle(plugin,file){
 module.exports={prepareArticle,markdown,formulaImage};
 
 },
-"./media-page": function(module,exports,require){
+'./media-page': function(module,exports,require){
 'use strict';
 const {escapeHtml}=require('./render-utils');
 
@@ -1002,12 +1002,19 @@ function browserMain(payload){
     if(checking||busy||expired)return;checking=true;refresh.disabled=true;send.disabled=true;status.textContent='正在检测扩展和登录状态…';
     try{
       for(let i=0;i<30&&!sdk();i++)await sleep(200);
-      if(!sdk()?.getAccounts||!sdk()?.addTask||!sdk()?.uploadImage)throw new Error('未检测到兼容的“文章同步助手”。请在当前 Edge 个人资料中安装扩展，并允许它访问此本机网页，然后刷新页面。');
-      const response=await call('getAccounts');accounts=Array.isArray(response)?response:response?.accounts||[];
+      if(!sdk()?.getAccounts||!sdk()?.addTask||!sdk()?.uploadImage)throw new Error('未检测到兼容的“文章同步助手”。请在 Edge 扩展详情中将“网站访问权限”设为“所有网站”，确认扩展已启用，然后刷新本页。');
+      // Login state can change while this page is open; bypass the extension's
+      // auth cache so Zhihu/CSDN reflect the current Edge cookies.
+      const getAccounts=sdk().getAccounts;
+      // Older Wechatsync releases only accept a callback. Preserve compatibility
+      // while using the force-refresh overload when the installed SDK supports it.
+      const response=getAccounts.length>=2
+        ?await call('getAccounts',{forceRefreshPlatforms:['zhihu','csdn']})
+        :await call('getAccounts');accounts=Array.isArray(response)?response:response?.accounts||[];
       for(const type of Object.keys(names)){
         const account=accounts.find(a=>a.type===type),input=document.querySelector('#'+type);
         input.disabled=!account||saved.has(type)||inFlight.has(type);
-        text(type+'-account',account?'已登录：'+account.title:'未登录，请先在同一 Edge 个人资料中登录');
+        text(type+'-account',account?'已登录：'+account.title:'未检测到账号。请在 Wechatsync 账号页确认该平台已列出并登录；若平台不在列表中，请更新扩展适配器。');
       }
       status.textContent='已完成检测。勾选平台后，点击“生成所选平台草稿”。';send.disabled=!accounts.some(a=>names[a.type]);
     }catch(error){status.textContent=error.message;}
@@ -1018,10 +1025,29 @@ function browserMain(payload){
     const htmlSources=[...tree.querySelectorAll('img')].map(img=>img.getAttribute('src')).filter(Boolean);
     const markdownSources=copy.markdown?[...copy.markdown.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(match=>match[1]):[];
     const sources=[...new Set([...htmlSources,...markdownSources])];
+    async function rasterize(source){
+      if(!/^data:image\//i.test(source))return source;
+      return await new Promise((resolve,reject)=>{
+        const image=new Image();image.onload=()=>{try{const canvas=document.createElement('canvas'),scale=Math.min(1,2400/Math.max(image.naturalWidth||1,image.naturalHeight||1));canvas.width=Math.max(1,Math.round((image.naturalWidth||1200)*scale));canvas.height=Math.max(1,Math.round((image.naturalHeight||800)*scale));const context=canvas.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>{if(!blob)return reject(new Error('图片格式转换失败'));const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('图片格式转换失败'));reader.readAsDataURL(blob);},'image/jpeg',0.92);}catch(error){reject(error);}};image.onerror=()=>reject(new Error('图片格式无法读取'));image.src=source;
+      });
+    }
+    if(account.type==='xiaohongshu'||account.type==='douyin'){
+      for(let i=0;i<sources.length;i++){
+        const source=sources[i],normalized=await rasterize(source);
+        if(normalized!==source){
+          for(const image of tree.querySelectorAll('img'))if(image.getAttribute('src')===source)image.setAttribute('src',normalized);
+          if(copy.markdown)copy.markdown=copy.markdown.split(source).join(normalized);
+        }
+      }
+      copy.content=tree.innerHTML;
+      text(account.type+'-progress','图片将由平台适配器上传');
+      return copy;
+    }
     for(let i=0;i<sources.length;i++){
       const source=sources[i];text(account.type+'-progress','上传图片 '+(i+1)+' / '+sources.length);
-      const result=await call('uploadImage',{src:source,account},120000),url=result?.result?.url||result?.url;
-      if(!/^https:\/\//i.test(url||''))throw new Error('图片上传没有返回有效地址，已停止创建草稿。');
+      const uploadSource=await rasterize(source);
+      const result=await call('uploadImage',{src:uploadSource,account},120000),url=result?.result?.url||result?.url;
+      if(!/^https:\/\//i.test(url||''))throw new Error(account.title+' 图片上传没有返回有效地址（原格式 '+((uploadSource.match(/^data:([^;,]+)/i)||[])[1]||'远程图片')+'），已停止创建草稿。');
       for(const image of tree.querySelectorAll('img'))if(image.getAttribute('src')===source)image.setAttribute('src',url);
       if(copy.markdown)copy.markdown=copy.markdown.split(source).join(url);
     }
@@ -1040,6 +1066,17 @@ function browserMain(payload){
     };
     try{sdk().addTask({post,accounts:[account]},handler,error=>{if(error?.error){clearTimeout(timer);reject(new Error(error.error));}});}catch(error){clearTimeout(timer);reject(error);}
   });}
+  function withoutImages(post){
+    const copy={...post,content:post.content||'',markdown:post.markdown||''};
+    const tree=document.createElement('div');tree.innerHTML=copy.content;
+    tree.querySelectorAll('img').forEach(image=>{
+      const figure=image.closest('figure');
+      (figure||image).remove();
+    });
+    copy.content=tree.innerHTML;
+    copy.markdown=copy.markdown.replace(/!\[[^\]]*\]\([^)]*\)/g,'');
+    return copy;
+  }
   send.addEventListener('click',async()=>{
     if(busy||expired)return;
     const selected=Object.keys(names).filter(type=>document.querySelector('#'+type).checked&&!saved.has(type)&&!inFlight.has(type));
@@ -1051,9 +1088,21 @@ function browserMain(payload){
       const account=accounts.find(a=>a.type===type);if(!account)continue;
       try{
         status.textContent='正在生成 '+names[type]+' 草稿，请保持本页打开…';
-        const post=await uploadImages(payload.article.posts[type],account);
+        let post=payload.article.posts[type];
         inFlight.add(type);
-        const url=await createDraft(post,account);saved.add(type);inFlight.delete(type);successes++;
+        let url;
+        try{
+          post=await uploadImages(post,account);
+          url=await createDraft(post,account);
+        }catch(error){
+          if((type==='xiaohongshu'||type==='douyin')&&payload.article.posts[type].content?.includes('<img')){
+            text(type+'-progress','图片处理或上传失败（'+error.message+'），正在改为仅文本草稿…');
+            post=withoutImages(payload.article.posts[type]);
+            try{url=await createDraft(post,account);}
+            catch(textError){throw new Error('图片上传失败：'+error.message+'；纯文本草稿也失败：'+textError.message);}
+          }else throw error;
+        }
+        saved.add(type);inFlight.delete(type);successes++;
         const result=document.querySelector('#'+type+'-result');result.replaceChildren();
         const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='打开编辑页并确认发布';result.append(link);
         text(type+'-progress','草稿已保存，尚未公开发布');
@@ -1106,7 +1155,7 @@ function page(payload,nonce){
 module.exports={page,browserMain};
 
 },
-"./media-publisher": function(module,exports,require){
+'./media-publisher': function(module,exports,require){
 'use strict';
 const fs=require('fs'),path=require('path'),http=require('http'),crypto=require('crypto');
 const {spawn}=require('child_process');
@@ -1132,7 +1181,8 @@ class MediaBridge{
     const server=http.createServer((req,res)=>this.handle(req,res).catch(()=>{if(!res.headersSent)res.writeHead(500);res.end('Local handoff failed');}));
     server.requestTimeout=15000;server.headersTimeout=10000;
     await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
-    this.server=server;this.origin='http://127.0.0.1:'+server.address().port;
+    // Use localhost so Edge's site-access setting treats the handoff page consistently.
+    this.server=server;this.origin='http://localhost:'+server.address().port;
     this.timer=setInterval(()=>{for(const [token,s]of this.sessions)if(s.expires<Date.now())this.sessions.delete(token);},60000);this.timer.unref?.();
   }
   async create(article,settings){
@@ -1173,4 +1223,4 @@ module.exports={MediaBridge,defaultEdge,openEdge,draftUrl};
 };
 const cache={};
 function load(name){if(!modules[name])return nativeRequire(name);if(!cache[name]){const part={exports:{}};cache[name]=part;modules[name](part,part.exports,load);}return cache[name].exports;}
-module.exports=load('./main');
+module.exports=load("./main");

@@ -14,7 +14,7 @@ function openEdge(executable,url){
   });
 }
 function draftUrl(platform,value){
-  try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(platform==='csdn'?url.hostname==='editor.csdn.net':platform==='zhihu'&&url.hostname==='zhuanlan.zhihu.com')?url.href:null;}catch{return null;}
+  try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&(({csdn:'editor.csdn.net',zhihu:'zhuanlan.zhihu.com',xiaohongshu:'creator.xiaohongshu.com',douyin:'creator.douyin.com'}[platform]===url.hostname))?url.href:null;}catch{return null;}
 }
 class MediaBridge{
   constructor(onResult){this.sessions=new Map();this.onResult=onResult;}
@@ -23,14 +23,15 @@ class MediaBridge{
     const server=http.createServer((req,res)=>this.handle(req,res).catch(()=>{if(!res.headersSent)res.writeHead(500);res.end('Local handoff failed');}));
     server.requestTimeout=15000;server.headersTimeout=10000;
     await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
-    this.server=server;this.origin='http://127.0.0.1:'+server.address().port;
+    // Use localhost so Edge's site-access setting treats the handoff page consistently.
+    this.server=server;this.origin='http://localhost:'+server.address().port;
     this.timer=setInterval(()=>{for(const [token,s]of this.sessions)if(s.expires<Date.now())this.sessions.delete(token);},60000);this.timer.unref?.();
   }
   async create(article,settings){
     await this.start();
     if(this.sessions.size>=8)throw new Error('已有多个发送窗口，请关闭后重新启用插件再试。');
     const token=crypto.randomBytes(24).toString('hex');
-    this.sessions.set(token,{article,platforms:['csdn','zhihu'].filter(type=>settings.mediaPlatforms?.includes(type)),autoOpen:settings.mediaAutoOpen!==false,expires:Date.now()+TTL,results:{}});
+    this.sessions.set(token,{article,platforms:['csdn','zhihu','xiaohongshu','douyin'].filter(type=>settings.mediaPlatforms?.includes(type)),autoOpen:settings.mediaAutoOpen!==false,expires:Date.now()+TTL,results:{}});
     return this.origin+'/'+token+'/';
   }
   async handle(req,res){
