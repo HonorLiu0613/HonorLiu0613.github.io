@@ -1,0 +1,23 @@
+interests:
+  - en: Robot control
+    zh: 机器人控制
+
+education:
+  - institution_en: Northeast Electric Power University
+    institution_zh: 东北电力大学
+    program_en: Undergraduate student in Robot Engineering
+    program_zh: 机器人工程本科
+    period_en: Sep 2023 - Jun 2027
+    period_zh: 2023年9月 - 2027年6月
+  - institution_en: East China University of Science and Technology
+    institution_zh: 华东理工大学
+    program_en: Incoming professional master's student
+    program_zh: 专业硕士研究生
+    period_en: Starting Sep 2027
+    period_zh: 2027年9月入学
+
+# Add bilingual project records with title_en, title_zh, summary_en, and summary_zh.
+projects: []
+
+# Add bilingual award records with title_en, title_zh, detail_en, and detail_zh.
+awards: []

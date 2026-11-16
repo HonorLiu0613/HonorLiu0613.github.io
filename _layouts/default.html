@@ -21,6 +21,7 @@
   {% endif %}
   {% include mathjax.html %}
   <script src="{{ '/assets/js/site.js' | versioned_asset | relative_url }}" defer></script>
+  {% if page.section == 'home' %}<script src="{{ '/assets/js/home-language.js' | versioned_asset | relative_url }}" defer></script>{% endif %}
   {% if page.section == 'notes' and page.layout != 'note' %}<script src="{{ '/assets/js/notes.js' | versioned_asset | relative_url }}" defer></script>{% endif %}
 </head>
 <body{% if page.section == 'home' %} class="home-page"{% endif %}>
