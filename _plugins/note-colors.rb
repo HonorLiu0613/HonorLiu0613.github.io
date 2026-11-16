@@ -1,7 +1,7 @@
 require 'digest'
 
 module NoteColors
-  PALETTE = %w[magenta coral orange yellow green sky blue purple].freeze
+  PALETTE = %w[coral orange yellow green sky blue purple].freeze
   NAMED = {
     'ros2' => 'green', 'px4' => 'blue', 'robotics' => 'green',
     '计算机网络' => 'sky', 'networking' => 'sky', 'tcp' => 'purple', 'udp' => 'orange',
@@ -12,7 +12,7 @@ module NoteColors
     'software' => 'blue', 'wechat' => 'green', 'projects' => 'blue',
     'personal' => 'coral', 'graduate study' => 'yellow', 'life' => 'coral',
     'jekyll' => 'orange', 'web development' => 'blue', 'research' => 'purple',
-    'notes' => 'magenta', '领域' => 'magenta'
+    'notes' => 'blue', '领域' => 'blue'
   }.freeze
 
   # Stable across builds and pages; new labels receive a deterministic fallback.

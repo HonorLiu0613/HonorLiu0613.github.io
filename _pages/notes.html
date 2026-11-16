@@ -8,7 +8,7 @@ redirect_from: [/posts/, /works/, /year-archive/, /wordpress/blog-posts/, /categ
 ---
 {% assign notes = site.notes | where: 'publish', true | sort: 'date' | reverse %}
 <section class="notes-browser" data-index-url="{{ '/notes-index.json' | relative_url }}" aria-label="Browse notes">
-  <div class="notes-filters" id="notes-filters" hidden>
+  <div class="notes-filters" id="notes-filters" hidden role="group" aria-label="Search and filter notes">
     <div class="search-field"><label for="note-search">Search notes</label><input id="note-search" type="search" placeholder="Search titles, content, or tags…" autocomplete="off"></div>
     <div><label for="domain-filter">Field</label><select id="domain-filter"><option value="">All fields</option></select></div>
     <div><label for="tag-filter">Tag</label><select id="tag-filter"><option value="">All tags</option></select></div>

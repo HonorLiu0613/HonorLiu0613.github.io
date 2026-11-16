@@ -1,14 +1,15 @@
 # Haoran Liu — Personal Website
 
-A Jekyll website organized into Home, Notes, Experience, and CV. The homepage keeps
-its original appearance. Filenames use English; article prose keeps its original language.
+A Jekyll website with Home and Notes in the primary navigation, plus a direct link to the CV PDF.
+Experience remains available as a standalone page. Filenames use English; article prose keeps its original language.
 
 | Section | Source | URL |
 | --- | --- | --- |
 | Home | `_pages/home.md` | `/` |
 | Notes | `_pages/notes.html` | `/notes/` |
-| Experience | `_pages/experience.html` | `/experience/` |
-| CV | `_pages/cv.html` | `/cv/` |
+| Experience | `_pages/experience.html` (not in primary navigation) | `/experience/` |
+| CV PDF | `files/cv.pdf` | `/files/cv.pdf` |
+| CV compatibility redirect | `_pages/cv.html` | `/cv/` |
 
 ## Editing and synchronizing notes
 

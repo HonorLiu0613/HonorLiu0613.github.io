@@ -5,9 +5,6 @@ main:
   - title: Notes
     url: /notes/
     section: notes
-  - title: Experience
-    url: /experience/
-    section: experience
   - title: CV
-    url: /cv/
+    url: /files/cv.pdf
     section: cv
