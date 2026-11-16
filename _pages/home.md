@@ -44,12 +44,12 @@ redirect_from: [/about/, /about.html]
 
 <hr class="home-divider">
 
-<section class="home-card home-recent" aria-labelledby="recent-title">
+<section class="home-recent" aria-labelledby="recent-title">
   <div class="home-section__heading-row">
     <h2 id="recent-title">Recent Notes</h2>
     <a href="{{ '/notes/' | relative_url }}">All notes <span aria-hidden="true"> &rarr;</span></a>
   </div>
-  <div class="home-post-list">
+  <div class="home-card home-post-list">
     {% for note in recent_notes %}
     {% assign palette_index = 0 %}
     {% if recent_last_index > 0 %}{% assign palette_index = forloop.index0 | times: palette_last_index | times: 1.0 | divided_by: recent_last_index | round %}{% endif %}

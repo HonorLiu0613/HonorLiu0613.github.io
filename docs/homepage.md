@@ -1,6 +1,6 @@
 # Homepage Editing Guide
 
-The homepage is a short academic profile: introduction and interests, two education cards, then a full-width Recent Notes card showing the latest three public notes. Notes summaries are omitted on Home. Home and Notes share the profile sidebar, navigation alignment, and field/topic pill styles. The interface uses English without a language switch.
+The homepage is a short academic profile: introduction and interests, two education cards, then a full-width Recent Notes card showing the latest three public notes. The Recent Notes heading and All notes link sit above the card border, aligned with the Education section heading. Notes summaries are omitted on Home. Home and Notes share the profile sidebar, navigation alignment, and field/topic pill styles. The interface uses English without a language switch.
 
 - `_pages/home.md`: introduction and section markup; automatically selects the latest three public notes by date, regardless of the `featured` property. Change the `slice: 0, 3` count to adjust how many appear.
 - `_data/home.yml`: education (`institution`, `program`, `period`) and research interests, plus reserved `projects` and `awards` lists.

@@ -235,10 +235,11 @@
 
 .home-education { margin: 0 0 21px; }
 
-.home-education .home-section__heading-row { margin: 0 0 11px; }
+.home-education .home-section__heading-row,
+.home-recent > .home-section__heading-row { margin: 0 0 11px; }
 
 .home-education h2,
-.home-card h2 {
+.home-recent h2 {
   margin: 0;
   color: #263442;
   font-size: 23px;
@@ -308,8 +309,6 @@
   background: #fff;
   box-shadow: 0 2px 7px rgba(48, 59, 69, .04);
 }
-
-.home-card .home-section__heading-row { margin-bottom: 12px; }
 
 .home-section__heading-row > a {
   flex: 0 0 auto;
