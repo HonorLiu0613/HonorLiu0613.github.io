@@ -7,10 +7,9 @@ redirect_from: [/about/, /about.html]
 ---
 
 {% assign public_notes = site.notes | where: 'publish', true | sort: 'date' | reverse %}
-{% assign featured_notes = public_notes | where: 'featured', true %}
-{% assign featured_note = featured_notes | first %}
-{% if featured_note == nil %}{% assign featured_note = public_notes | first %}{% endif %}
-{% assign recent_notes = public_notes | where_exp: 'note', 'note.url != featured_note.url' %}
+{% assign recent_notes = public_notes | slice: 0, 3 %}
+{% assign palette_last_index = site.data.note_palette.size | minus: 1 %}
+{% assign recent_last_index = recent_notes.size | minus: 1 %}
 
 <section class="home-hero" aria-labelledby="intro-title">
   <div class="home-hero__top"><div class="home-hero__eyebrow">ROBOTICS · ROBOT CONTROL</div></div>
@@ -45,40 +44,23 @@ redirect_from: [/about/, /about.html]
 
 <hr class="home-divider">
 
-<div class="home-notes-grid">
-  <section class="home-card home-recent" aria-labelledby="recent-title">
-    <div class="home-section__heading-row">
-      <h2 id="recent-title">Recent Notes</h2>
-      <a href="{{ '/notes/' | relative_url }}">All notes <span aria-hidden="true"> &rarr;</span></a>
-    </div>
-    <div class="home-post-list">
-      {% for note in recent_notes limit: 3 %}
-      <article class="home-post">
-        <div class="home-post__meta">
-          {% if note.domain %}<span>{{ note.domain }}</span>{% endif %}
-          <time datetime="{{ note.date | date_to_xmlschema }}">{{ note.date | date: '%b %Y' }}</time>
-        </div>
-        <h3><a href="{{ note.url | relative_url }}">{{ note.title }}</a></h3>
-        {% if note.tags.size > 0 %}<ul class="home-post__tags" aria-label="Topics">{% for tag in note.tags limit: 3 %}<li data-tone="{{ tag | note_tone }}">{{ tag }}</li>{% endfor %}</ul>{% endif %}
-      </article>
-      {% endfor %}
-    </div>
-  </section>
-
-  {% if featured_note %}
-  <section class="home-card home-featured" aria-labelledby="featured-title">
-    <div class="home-section__heading-row">
-      <h2 id="featured-title">Featured Note</h2>
-      <span class="home-featured__mark" aria-hidden="true">✦</span>
-    </div>
-    <a class="home-featured__link" href="{{ featured_note.url | relative_url }}">
-      <span class="home-featured__domain">{{ featured_note.domain | default: 'Note' }}</span>
-      <h3>{{ featured_note.title }}</h3>
-      <span class="home-featured__date"><time datetime="{{ featured_note.date | date_to_xmlschema }}">{{ featured_note.date | date: '%B %d, %Y' }}</time><span aria-hidden="true"> &rarr;</span></span>
-    </a>
-    {% if featured_note.tags.size > 0 %}
-    <ul class="home-featured__tags" aria-label="Topics">{% for tag in featured_note.tags limit: 3 %}<li data-tone="{{ tag | note_tone }}">{{ tag }}</li>{% endfor %}</ul>
-    {% endif %}
-  </section>
-  {% endif %}
-</div>
+<section class="home-card home-recent" aria-labelledby="recent-title">
+  <div class="home-section__heading-row">
+    <h2 id="recent-title">Recent Notes</h2>
+    <a href="{{ '/notes/' | relative_url }}">All notes <span aria-hidden="true"> &rarr;</span></a>
+  </div>
+  <div class="home-post-list">
+    {% for note in recent_notes %}
+    {% assign palette_index = 0 %}
+    {% if recent_last_index > 0 %}{% assign palette_index = forloop.index0 | times: palette_last_index | times: 1.0 | divided_by: recent_last_index | round %}{% endif %}
+    <article class="home-post" style="--note-row-color: {{ site.data.note_palette[palette_index] }};">
+      <div class="home-post__meta">
+        <div class="note-card__field"><span class="note-card__label">Field:</span><span class="field-badge">{{ note.domain | default: 'Notes' }}</span></div>
+        <time datetime="{{ note.date | date_to_xmlschema }}">{{ note.date | date: '%b %Y' }}</time>
+      </div>
+      <h3><a href="{{ note.url | relative_url }}">{{ note.title }}</a></h3>
+      {% if note.tags.size > 0 %}<div class="home-post__topics"><span class="note-card__label">Tags:</span><div class="tag-list">{% for tag in note.tags %}<a class="tag" href="{{ '/notes/' | relative_url }}?tag={{ tag | url_encode }}">{{ tag }}</a>{% endfor %}</div></div>{% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>

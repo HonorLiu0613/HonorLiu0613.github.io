@@ -45,7 +45,7 @@ exported to the website; their contents are not merged bidirectionally.
 - `_data/navigation.yml`: the Home, Notes, and direct CV links.
 - `_data/home.yml`: research interests and education; reserved lists for future projects and awards.
 - `_includes/profile-sidebar.html`: the shared profile sidebar on Home and Notes.
-- `_data/note_palette.yml`: the eight colors used from the first Notes row to the last.
+- `_data/note_palette.yml`: the eight colors shared by Home note pills and Notes rows.
 - `files/cv.pdf`: the embedded/downloadable CV document.
 - `images/experience/`: competition photos; legacy `images/notes/` URLs remain available.
 - `tools/website-note-sync/src/`: desktop plugin sources. Run its `build.py` to bundle `main.js`.
@@ -53,8 +53,9 @@ exported to the website; their contents are not merged bidirectionally.
 - `docs/homepage.md`: homepage sections and editing locations.
 
 Note properties include `title`, `date`, `updated`, `publish`, `domain`, `tags`, and `featured`.
-Set `featured: true` for Home's featured selection. The plugin manages render-related
-properties and stable identifiers; keep them intact when editing website Markdown.
+Home shows the latest three public notes by date; `featured` remains an optional metadata
+property and does not affect this selection. The plugin manages render-related properties
+and stable identifiers; keep them intact when editing website Markdown.
 
 ## Styles
 
@@ -70,11 +71,12 @@ properties and stable identifiers; keep them intact when editing website Markdow
 ## Editing the homepage
 
 - Edit the English introduction and section labels in `_pages/home.md`.
+- The full-width Recent Notes card automatically lists the latest three public notes; adjust `slice: 0, 3` in `_pages/home.md` to change the count.
 - Edit education and research interests in `_data/home.yml`.
 - The `projects` and `awards` arrays in `_data/home.yml` are reserved for future sections; add their presentation to `_pages/home.md` when ready.
 - Update the shared profile bio in `_includes/profile-sidebar.html`; edit contact details and the avatar path in `_config.yml`.
 - Adjust layout, typography, card borders, and tag appearance in `assets/css/home.css`; general navigation and page transitions are in `assets/css/site.css`.
-- Edit the eight Notes row colors in `_data/note_palette.yml`. Visible rows sample this palette evenly, keeping the first and last colors. Filtering and column changes recalculate the rows.
+- Edit the eight shared note colors in `_data/note_palette.yml`. Home field/topic pills and visible Notes rows sample this palette evenly, keeping the first and last colors. Notes filtering and column changes recalculate the rows.
 - The CV navigation item points directly to `files/cv.pdf`.
 
 The native renderer preserves common Markdown structures and syntax highlighting. Math uses
