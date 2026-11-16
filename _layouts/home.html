@@ -6,8 +6,8 @@ layout: default
     <div class="author__avatar"><img src="{{ site.author.avatar | relative_url }}" alt="Profile image for Haoran Liu" width="210" height="210" fetchpriority="high"></div>
     <h3 class="author__name">{{ site.name }}</h3>
     <p class="author__bio">
-      <span data-home-copy="en">Robot Engineering undergraduate at Northeast Electric Power University.</span>
-      <span data-home-copy="zh" hidden>东北电力大学机器人工程本科生。</span>
+      <span data-home-copy="en">Robot Engineering undergraduate at NEEPU; incoming master's student at ECUST.</span>
+      <span data-home-copy="zh" hidden>东北电力大学机器人工程本科生，拟于华东理工大学攻读硕士。</span>
     </p>
     <ul class="author__urls">
       <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg><span data-home-copy="en">China</span><span data-home-copy="zh" hidden>中国</span></li>
@@ -16,10 +16,6 @@ layout: default
     </ul>
   </aside>
   <article class="home-content">
-    <div class="home-language-switch" role="group" aria-label="Choose language">
-      <button type="button" data-home-lang="en" lang="en" aria-pressed="true">EN</button>
-      <button type="button" data-home-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
-    </div>
     <div class="home-body">{{ content }}</div>
   </article>
 </div>
