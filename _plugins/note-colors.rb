@@ -1,18 +1,18 @@
 require 'digest'
 
 module NoteColors
-  PALETTE = %w[blue violet teal amber rose cyan indigo orange lime slate].freeze
+  PALETTE = %w[magenta coral orange yellow green sky blue purple].freeze
   NAMED = {
-    'ros2' => 'teal', 'px4' => 'blue', 'robotics' => 'teal',
-    '计算机网络' => 'cyan', 'networking' => 'cyan', 'tcp' => 'indigo', 'udp' => 'orange',
-    '深度学习' => 'violet', '领域/深度学习' => 'violet', 'deep learning' => 'violet',
-    '模块/转置卷积' => 'amber', '模块/上采样' => 'teal',
-    'control & estimation' => 'amber', '控制与估计' => 'amber', 'control' => 'amber',
-    'kalman filter' => 'violet', 'mathematics' => 'rose',
-    'software' => 'blue', 'wechat' => 'teal', 'projects' => 'indigo',
-    'personal' => 'rose', 'graduate study' => 'amber', 'life' => 'rose',
-    'jekyll' => 'orange', 'web development' => 'blue', 'research' => 'indigo',
-    'notes' => 'slate', '领域' => 'slate'
+    'ros2' => 'green', 'px4' => 'blue', 'robotics' => 'green',
+    '计算机网络' => 'sky', 'networking' => 'sky', 'tcp' => 'purple', 'udp' => 'orange',
+    '深度学习' => 'purple', '领域/深度学习' => 'purple', 'deep learning' => 'purple',
+    '模块/转置卷积' => 'yellow', '模块/上采样' => 'green',
+    'control & estimation' => 'orange', '控制与估计' => 'orange', 'control' => 'orange',
+    'kalman filter' => 'purple', 'mathematics' => 'coral',
+    'software' => 'blue', 'wechat' => 'green', 'projects' => 'blue',
+    'personal' => 'coral', 'graduate study' => 'yellow', 'life' => 'coral',
+    'jekyll' => 'orange', 'web development' => 'blue', 'research' => 'purple',
+    'notes' => 'magenta', '领域' => 'magenta'
   }.freeze
 
   # Stable across builds and pages; new labels receive a deterministic fallback.

@@ -52,16 +52,14 @@ img { max-width: 100%; }
 .tag, .field-badge { display: inline-flex; align-items: center; max-width: 100%; background: var(--badge-bg, #edf1f5); color: var(--badge-ink, #4b5e70); border: 1px solid var(--badge-border, #d7e0e9); font-size: 14px; font-weight: 550; line-height: 1.45; padding: 5px 11px; border-radius: 6px; text-decoration: none; overflow-wrap: anywhere; }
 .field-badge { font-weight: 650; }
 .tag:hover { border-color: var(--badge-ink); text-decoration: underline; text-underline-offset: 3px; }
-[data-tone="blue"] { --badge-bg: #eaf2ff; --badge-ink: #244b86; --badge-border: #cfddf1; }
-[data-tone="violet"] { --badge-bg: #f0ebff; --badge-ink: #5e3894; --badge-border: #dfd3f5; }
-[data-tone="teal"] { --badge-bg: #e5f5ef; --badge-ink: #17624f; --badge-border: #c5e7db; }
-[data-tone="amber"] { --badge-bg: #fff3d9; --badge-ink: #85510b; --badge-border: #eed9ab; }
-[data-tone="rose"] { --badge-bg: #fdecef; --badge-ink: #9a3650; --badge-border: #f3ccd6; }
-[data-tone="cyan"] { --badge-bg: #e7f5fb; --badge-ink: #1a607a; --badge-border: #c9e6f0; }
-[data-tone="indigo"] { --badge-bg: #eceffd; --badge-ink: #414e91; --badge-border: #d5dcf7; }
-[data-tone="orange"] { --badge-bg: #fff0e5; --badge-ink: #954615; --badge-border: #f1d6bf; }
-[data-tone="lime"] { --badge-bg: #f0f4e1; --badge-ink: #53691d; --badge-border: #dce5bc; }
-[data-tone="slate"] { --badge-bg: #edf1f5; --badge-ink: #4b5e70; --badge-border: #d7e0e9; }
+[data-tone="magenta"] { --badge-bg: #fae9f2; --badge-ink: #7d164d; --badge-border: #cc247c; }
+[data-tone="coral"] { --badge-bg: #fceae9; --badge-ink: #8e302f; --badge-border: #e95351; }
+[data-tone="orange"] { --badge-bg: #fff1e4; --badge-ink: #82440e; --badge-border: #f7a24f; }
+[data-tone="yellow"] { --badge-bg: #fffbe0; --badge-ink: #665b09; --badge-border: #fbeb66; }
+[data-tone="green"] { --badge-bg: #eaf5ec; --badge-ink: #245a30; --badge-border: #4ea660; }
+[data-tone="sky"] { --badge-bg: #eaf7fe; --badge-ink: #245d79; --badge-border: #79cafb; }
+[data-tone="blue"] { --badge-bg: #eaf1fe; --badge-ink: #244a83; --badge-border: #5292f7; }
+[data-tone="purple"] { --badge-bg: #f3edfc; --badge-ink: #593a86; --badge-border: #aa77e9; }
 .notes-filters { display: grid; grid-template-columns: minmax(0, 1fr) 190px 190px auto; gap: 16px; align-items: end; background: var(--site-surface); border: 1px solid var(--site-line); border-radius: var(--site-radius); padding: 22px; }
 .notes-filters label { display: block; font-size: 16px; font-weight: 550; color: var(--site-muted); margin-bottom: 8px; }
 .notes-filters input, .notes-filters select { width: 100%; min-width: 0; height: 44px; padding: 8px 10px; background: var(--site-bg); color: var(--site-ink); border: 1px solid #ced9e4; border-radius: 6px; font-size: 15px; }
