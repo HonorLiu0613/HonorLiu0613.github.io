@@ -20,6 +20,15 @@ module NoteColors
     label = value.to_s.strip.downcase
     NAMED[label] || PALETTE[Digest::SHA256.hexdigest(label).to_i(16) % PALETTE.length]
   end
+
+  # Match the browser's row sampling before JavaScript has downloaded.
+  def note_row_color(palette, index, count, columns)
+    columns = [columns.to_i, 1].max
+    row_count = (count.to_i + columns - 1) / columns
+    row_index = index.to_i / columns
+    palette_index = row_count > 1 ? (row_index * (palette.size - 1).to_f / (row_count - 1)).round : 0
+    palette[palette_index]
+  end
 end
 
 Liquid::Template.register_filter(NoteColors)

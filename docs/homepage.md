@@ -12,6 +12,7 @@ The homepage is a short academic profile: introduction and interests, two educat
 - `_pages/notes.html` and `_includes/note-card.html`: Notes filters and cards, including `Field:` and `Tags:` labels.
 - `_data/note_palette.yml`: shared Home/Notes palette. Home field/topic pills sample the colors evenly across its recent-note rows. On Notes, the first visible row uses `#CC247C` and the last uses `#AA77E9`. With fewer than eight rows, colors are sampled evenly from the palette; with more rows, some colors repeat. One visible row uses the first color.
 - `assets/js/notes.js`: search, filters, and row color recalculation when filtering or changing the layout width.
+- `_plugins/note-colors.rb`: generates initial row colors for desktop and mobile during the build. The Notes filter controls and options are also rendered in HTML, so the layout and palette are ready before JavaScript downloads. Controls become enabled when the search script is ready; article-only scripts are loaded only on article pages.
 - `_data/navigation.yml`: Home, Notes, and direct CV links.
 - `files/cv.pdf`: the PDF opened directly by the CV navigation item.
 

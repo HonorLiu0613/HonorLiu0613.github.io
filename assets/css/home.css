@@ -462,7 +462,7 @@
 .notes-page .notes-filters select:focus { border-color: #b85450; box-shadow: 0 0 0 3px rgba(184, 84, 80, .12); }
 .notes-page .note-grid { gap: 14px; }
 .notes-page .note-card {
-  --note-row-color: #CC247C;
+  --note-row-color: var(--note-color-wide, #CC247C);
   padding: 17px 19px;
   border: 2px solid var(--note-row-color);
   border-top-width: 4px;
@@ -500,6 +500,7 @@
 
 @media (max-width: 760px) {
   .notes-layout { display: block; }
+  .notes-page .note-card { --note-row-color: var(--note-color-narrow, #CC247C); }
   .notes-page-heading h1 { font-size: 30px; }
   .notes-page .notes-filters { grid-template-columns: 1fr 1fr; padding: 16px 0; }
   .notes-page .notes-filters .search-field,

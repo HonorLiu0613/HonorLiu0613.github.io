@@ -8,6 +8,10 @@ description: Notes on robotics, control, software, and life.
 redirect_from: [/posts/, /works/, /year-archive/, /wordpress/blog-posts/, /categories/, /tags/]
 ---
 {% assign notes = site.notes | where: 'publish', true | sort: 'date' | reverse %}
+{% assign note_fields = notes | map: 'domain' | compact | uniq | sort_natural %}
+{% assign note_tags = '' | split: '' %}
+{% for note in notes %}{% if note.tags %}{% assign note_tags = note_tags | concat: note.tags %}{% endif %}{% endfor %}
+{% assign note_tags = note_tags | uniq | sort_natural %}
 <div class="home-layout notes-layout">
   {% include profile-sidebar.html %}
   <article class="home-content notes-content">
@@ -17,16 +21,16 @@ redirect_from: [/posts/, /works/, /year-archive/, /wordpress/blog-posts/, /categ
       <p class="page-description">Notes on robotics, control, software, and life.</p>
     </header>
     <section class="notes-browser" data-index-url="{{ '/notes-index.json' | relative_url }}" aria-label="Browse notes">
-      <div class="notes-filters" id="notes-filters" hidden role="group" aria-label="Search and filter notes">
+      <fieldset class="notes-filters" id="notes-filters" disabled aria-busy="true" aria-label="Search and filter notes">
         <div class="search-field"><label for="note-search">Search notes</label><input id="note-search" type="search" placeholder="Search titles, content, or tags…" autocomplete="off"></div>
-        <div><label for="domain-filter">Field:</label><select id="domain-filter"><option value="">All fields</option></select></div>
-        <div><label for="tag-filter">Tags:</label><select id="tag-filter"><option value="">All tags</option></select></div>
+        <div><label for="domain-filter">Field:</label><select id="domain-filter"><option value="">All fields</option>{% for field in note_fields %}{% unless field == '' %}<option value="{{ field | escape }}">{{ field | escape }}</option>{% endunless %}{% endfor %}</select></div>
+        <div><label for="tag-filter">Tags:</label><select id="tag-filter"><option value="">All tags</option>{% for tag in note_tags %}{% unless tag == '' %}<option value="{{ tag | escape }}">{{ tag | escape }}</option>{% endunless %}{% endfor %}</select></div>
         <button class="filter-reset" id="filter-reset" type="button">Reset</button>
-      </div>
+      </fieldset>
       <p class="result-count" id="result-count" role="status" aria-live="polite">{{ notes.size }} notes</p>
-      <div class="note-grid" id="notes-list" data-row-palette="{{ site.data.note_palette | jsonify | escape }}">{% for note in notes %}{% include note-card.html note=note %}{% endfor %}</div>
+      <div class="note-grid" id="notes-list" data-row-palette="{{ site.data.note_palette | jsonify | escape }}">{% for note in notes %}{% include note-card.html note=note index=forloop.index0 total=notes.size %}{% endfor %}</div>
       <p class="empty-state" id="empty-state" hidden>No notes match your search. Try another term or reset the filters.</p>
-      <noscript><p>All public notes are listed below. Enable JavaScript to search and filter.</p></noscript>
+      <noscript><p>All public notes are shown. Enable JavaScript to search and filter.</p></noscript>
     </section>
   </article>
 </div>

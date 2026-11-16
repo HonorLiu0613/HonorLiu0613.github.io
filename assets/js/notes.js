@@ -4,6 +4,7 @@
   const browser = document.querySelector('.notes-browser');
   if (!browser) return;
   const search = document.querySelector('#note-search');
+  const filters = document.querySelector('#notes-filters');
   const domainSelect = document.querySelector('#domain-filter');
   const tagSelect = document.querySelector('#tag-filter');
   const count = document.querySelector('#result-count');
@@ -40,16 +41,6 @@
     tags: JSON.parse(card.dataset.tags || '[]') || [],
     text: normalize(card.textContent)
   }));
-  const addOptions = (select, values) => {
-    [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b)).forEach(value => {
-      const option = document.createElement('option');
-      option.value = value;
-      option.textContent = value;
-      select.append(option);
-    });
-  };
-  addOptions(domainSelect, entries.map(entry => entry.domain));
-  addOptions(tagSelect, entries.flatMap(entry => entry.tags));
   const syncFromUrl = () => {
     const params = new URLSearchParams(location.search);
     search.value = params.get('q') || '';
@@ -69,7 +60,7 @@
     });
     count.textContent = `${matches} ${matches === 1 ? 'note' : 'notes'}${search.value && !fullTextLoaded ? ' · searching titles, summaries, and tags' : ''}`;
     document.querySelector('#empty-state').hidden = matches > 0;
-    scheduleRowColors();
+    updateRowColors();
     if (updateUrl) {
       const url = new URL(location.href);
       [['q', search.value], ['field', domainSelect.value], ['tag', tagSelect.value]].forEach(([key, value]) => {
@@ -79,7 +70,6 @@
     }
   };
   syncFromUrl();
-  document.querySelector('#notes-filters').hidden = false;
   search.addEventListener('input', () => applyFilters());
   domainSelect.addEventListener('change', () => applyFilters());
   tagSelect.addEventListener('change', () => applyFilters());
@@ -88,6 +78,8 @@
   });
   window.addEventListener('popstate', () => { syncFromUrl(); applyFilters(false); });
   applyFilters(false);
+  filters.disabled = false;
+  filters.removeAttribute('aria-busy');
   fetch(browser.dataset.indexUrl).then(response => {
     if (!response.ok) throw new Error('Search index unavailable');
     return response.json();

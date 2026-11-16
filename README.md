@@ -67,6 +67,7 @@ and stable identifiers; keep them intact when editing website Markdown.
 - `assets/css/syntax.css`: Rouge colors for Jekyll-rendered experience articles.
 - `assets/js/site.js`: article outline, code language labels, and copy buttons.
 - `assets/js/notes.js`: domain/tag filters, full-text search, and responsive row colors.
+- Notes filters and their options are present in the generated HTML. `_plugins/note-colors.rb` supplies desktop/mobile initial colors, avoiding a hidden search bar and all-pink cards during a cold load. The script enables the controls and handles subsequent filtering and resizing; `site.js` is loaded only on article pages.
 
 ## Editing the homepage
 
