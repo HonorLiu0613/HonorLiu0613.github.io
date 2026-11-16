@@ -1,6 +1,6 @@
 # Primary navigation: Home, Notes, and a direct link to the CV PDF.
-title: Haoran Liu
-name: Haoran Liu
+title: Honor Liu
+name: Honor Liu
 description: Robot Engineering student interested in robot control.
 url: https://honorliu.top
 baseurl: ""
@@ -9,7 +9,7 @@ lang: en
 timezone: Asia/Shanghai
 repository: HonorLiu0613/HonorLiu0613.github.io
 author:
-  name: Haoran Liu
+  name: Honor Liu
   avatar: /images/profile.jpg
   bio: Robot Engineering undergraduate at Northeast Electric Power University.
   email: honorliu2026@163.com

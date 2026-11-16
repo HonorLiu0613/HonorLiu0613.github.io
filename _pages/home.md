@@ -13,7 +13,7 @@ redirect_from: [/about/, /about.html]
 
 <section class="home-hero" aria-labelledby="intro-title">
   <div class="home-hero__top"><div class="home-hero__eyebrow">ROBOTICS · ROBOT CONTROL</div></div>
-  <h1 class="home-hero__title" id="intro-title">Hi, I am Haoran Liu.</h1>
+  <h1 class="home-hero__title" id="intro-title">Hi, I am {{ site.name | escape }}.</h1>
   <p class="home-hero__description">I am an undergraduate student in Robot Engineering at Northeast Electric Power University, graduating in June 2027. I will join East China University of Science and Technology as a professional master's student in September 2027. My research interest is robot control.</p>
   <ul class="interest-list" aria-label="Research interests">
     {% for interest in site.data.home.interests %}<li>{{ interest }}</li>{% endfor %}

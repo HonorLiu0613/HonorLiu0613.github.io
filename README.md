@@ -1,4 +1,4 @@
-# Haoran Liu — Personal Website
+# Honor Liu — Personal Website
 
 A Jekyll website with Home and Notes in the primary navigation, plus a direct link to the CV PDF.
 Experience remains available as a standalone page. Filenames use English; article prose keeps its original language.
