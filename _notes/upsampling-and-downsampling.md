@@ -1,14 +1,9 @@
 ---
-类型: 知识笔记
-领域: 深度学习
-状态: 学习中
-创建时间: 2026-11-12 15:01
-修改时间: 2026-11-14 21:15:21
 tags:
-  - 领域/深度学习
+  - DL
 title: 上采样与下采样 UpSample DownSample
 date: 2026-11-12
-updated: 2026-11-15
+updated: 2026-11-16
 publish: true
 domain: 深度学习
 featured: false
@@ -17,7 +12,6 @@ web_slug: upsampling-and-downsampling
 web_id: upsampling-and-downsampling
 rendered_body: rendered-notes/upsampling-and-downsampling.html
 rendered_source_hash: b4b7150e6c20b15def0f7e24e4582df7335461257120f91eaac77a610612dbbf
-source_vault_path: 02-知识笔记/1. 深度学习/2. 上采样与下采样 UpSample DownSample.md
 mathjax: true
 render_with_liquid: false
 ---

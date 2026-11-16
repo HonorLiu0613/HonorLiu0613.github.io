@@ -1,14 +1,10 @@
 ---
-类型: 知识笔记
-领域: ROS2
-状态: 学习中
-创建时间: 2026-11-14 16:19
-修改时间: 2026-11-15 11:50:26
 tags:
   - ROS2
+  - PX4
 title: 桥接器 uXRCE-DDS中间件
 date: 2026-11-14
-updated: 2026-11-15
+updated: 2026-11-16
 publish: true
 domain: ROS2
 featured: true
@@ -17,7 +13,6 @@ web_slug: micro-xrce-dds-bridge
 web_id: micro-xrce-dds-bridge
 rendered_body: rendered-notes/micro-xrce-dds-bridge.html
 rendered_source_hash: da766e860699eb29b2887ac36b24980b77ece0e43f2a627a177c259fcae192da
-source_vault_path: 02-知识笔记/2. 无人机 PX4-ROS2/2. 桥接器 uXRCE-DDS中间件.md
 mathjax: true
 render_with_liquid: false
 ---

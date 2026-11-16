@@ -1,15 +1,10 @@
 ---
-类型: 知识笔记
-领域: ROS2
-状态: 学习中
-创建时间: 2026-11-14 15:51
-修改时间: 2026-11-15 19:38:12
 tags:
-  - 领域
   - ROS2
+  - PX4
 title: 环境搭建 PX4 v1.17.0  Ubuntu22.04
 date: 2026-11-14
-updated: 2026-11-15
+updated: 2026-11-16
 publish: true
 domain: ROS2
 featured: false
@@ -18,7 +13,6 @@ web_slug: px4-ubuntu-setup
 web_id: px4-ubuntu-setup
 rendered_body: rendered-notes/px4-ubuntu-setup.html
 rendered_source_hash: c6bfe64847c7e6824c50f521d9bbde20d35e28ee88d458e0daacb5e0603a9948
-source_vault_path: 02-知识笔记/2. 无人机 PX4-ROS2/1. 环境搭建 PX4 v1.17.0  Ubuntu22.04.md
 mathjax: true
 render_with_liquid: false
 ---

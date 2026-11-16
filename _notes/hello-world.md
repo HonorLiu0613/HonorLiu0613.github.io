@@ -7,15 +7,11 @@ updated: 2026-11-15
 publish: true
 domain: Life
 excerpt: The start of a personal space for notes, projects, and experiences.
-redirect_from:
-  - /posts/2026/07/hello-world/
 web_id: hello-world
 web_slug: hello-world
-修改时间: 2026-11-14 21:15:46
 featured: false
 rendered_body: rendered-notes/hello-world.html
 rendered_source_hash: 25ddce1154c980ba988a6104515219723ccefc59100f9b6cbd99150ac906a50b
-source_vault_path: 05-闲杂随记/hello-world.md
 mathjax: true
 render_with_liquid: false
 ---

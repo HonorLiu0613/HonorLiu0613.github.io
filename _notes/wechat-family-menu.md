@@ -9,14 +9,10 @@ tags:
   - WeChat
   - Projects
 featured: true
-redirect_from:
-  - /portfolio/2026-10-13-micro_program_on_wechat/
 web_id: wechat-family-menu
 web_slug: wechat-family-menu
-修改时间: 2026-11-14 21:15:44
 rendered_body: rendered-notes/wechat-family-menu.html
 rendered_source_hash: 9c1b6f3924c3f59c7d2254778b5779b997f27606a8afbab579fe0eab9989b76b
-source_vault_path: 04-项目实验/2. 微信小程序/wechat-family-menu.md
 mathjax: true
 render_with_liquid: false
 ---

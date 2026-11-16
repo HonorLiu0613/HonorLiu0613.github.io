@@ -1,16 +1,9 @@
 ---
-类型: 知识笔记
-领域: 深度学习
-状态: 学习中
-创建时间: 2026-11-12 00:00
-修改时间: 2026-11-14 21:15:19
 tags:
-  - 领域/深度学习
-  - 模块/转置卷积
-  - 模块/上采样
+  - DL
 title: 转置卷积 Transpose Conv
 date: 2026-11-12
-updated: 2026-11-15
+updated: 2026-11-16
 publish: true
 domain: 深度学习
 featured: false
@@ -19,7 +12,6 @@ web_slug: transpose-convolution
 web_id: transpose-convolution
 rendered_body: rendered-notes/transpose-convolution.html
 rendered_source_hash: aab822da1e9ec1f1ef63bbb220a7ddac112054eea3f1cd290e9c7f0643220c6d
-source_vault_path: 02-知识笔记/1. 深度学习/1. 转置卷积 Transpose Conv.md
 mathjax: true
 render_with_liquid: false
 ---
