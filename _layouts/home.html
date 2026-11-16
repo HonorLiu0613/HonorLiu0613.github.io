@@ -1,20 +1,8 @@
 ---
 layout: default
 ---
-<div class="home-layout" data-home-language-root data-current-language="en">
-  <aside class="sidebar home-sidebar" aria-label="Profile">
-    <div class="author__avatar"><img src="{{ site.author.avatar | relative_url }}" alt="Profile image for Haoran Liu" width="210" height="210" fetchpriority="high"></div>
-    <h3 class="author__name">{{ site.name }}</h3>
-    <p class="author__bio">
-      <span data-home-copy="en">Robot Engineering undergraduate at NEEPU; incoming master's student at ECUST.</span>
-      <span data-home-copy="zh" hidden>东北电力大学机器人工程本科生，拟于华东理工大学攻读硕士。</span>
-    </p>
-    <ul class="author__urls">
-      <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg><span data-home-copy="en">China</span><span data-home-copy="zh" hidden>中国</span></li>
-      <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 5h20v14H2V5Zm2 2 8 6 8-6H4Zm16 10V9l-8 6-8-6v8h16Z"/></svg><a href="mailto:{{ site.author.email }}"><span data-home-copy="en">Email</span><span data-home-copy="zh" hidden>邮箱</span></a></li>
-      <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.68.08-.68 1.13.08 1.72 1.16 1.72 1.16 1 1.71 2.63 1.22 3.27.93.1-.72.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.55 0-1.23.44-2.24 1.16-3.03-.12-.29-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.16a10.7 10.7 0 0 1 5.6 0c2.13-1.46 3.08-1.16 3.08-1.16.61 1.55.23 2.69.11 2.98.72.79 1.16 1.8 1.16 3.03 0 4.31-2.64 5.26-5.15 5.54.4.35.76 1.04.76 2.1v3.08c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z"/></svg><a href="https://github.com/{{ site.author.github }}">GitHub</a></li>
-    </ul>
-  </aside>
+<div class="home-layout">
+  {% include profile-sidebar.html %}
   <article class="home-content">
     <div class="home-body">{{ content }}</div>
   </article>

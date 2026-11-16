@@ -43,8 +43,9 @@ exported to the website; their contents are not merged bidirectionally.
 - `assets/notes/<slug>/`: generated linked attachments with content hashes.
 - `_experience/`: experience articles; `_data/experience.yml` supplies the timeline.
 - `_data/navigation.yml`: the Home, Notes, and direct CV links.
-- `_data/home.yml`: bilingual research interests and education; add project and award records here when ready.
-- `assets/js/home-language.js`: the Home page language switch.
+- `_data/home.yml`: research interests and education; reserved lists for future projects and awards.
+- `_includes/profile-sidebar.html`: the shared profile sidebar on Home and Notes.
+- `_data/note_palette.yml`: the eight colors used from the first Notes row to the last.
 - `files/cv.pdf`: the embedded/downloadable CV document.
 - `images/experience/`: competition photos; legacy `images/notes/` URLs remain available.
 - `tools/website-note-sync/src/`: desktop plugin sources. Run its `build.py` to bundle `main.js`.
@@ -57,22 +58,23 @@ properties and stable identifiers; keep them intact when editing website Markdow
 
 ## Styles
 
-- `assets/css/home.css`: academic profile and responsive Home layout, loaded only on Home.
+- `assets/css/home.css`: shared Home/Notes profile layout, card borders, and responsive styling.
 - `assets/css/site.css`: navigation, page layouts, flatter note cards, timeline, and CV.
 - `assets/css/border.css`: generated article typography, scoped to `.note-body`, captured from
   the active Obsidian theme and Style Settings. Current theme:
   [Border 1.13.9 by Akifyss](https://github.com/Akifyss/obsidian-border).
 - `assets/css/syntax.css`: Rouge colors for Jekyll-rendered experience articles.
 - `assets/js/site.js`: article outline, code language labels, and copy buttons.
-- `assets/js/notes.js`: domain/tag filters and full-text search.
+- `assets/js/notes.js`: domain/tag filters, full-text search, and responsive row colors.
 
 ## Editing the homepage
 
-- Edit the bilingual introduction and section labels in `_pages/home.md`.
+- Edit the English introduction and section labels in `_pages/home.md`.
 - Edit education and research interests in `_data/home.yml`.
-- Add bilingual project or award entries to the matching arrays in `_data/home.yml`; each item is rendered automatically. Empty arrays stay hidden, so unfinished sections do not appear on the public page.
-- Update the profile links and bio in `_layouts/home.html` and `_config.yml`.
-- Adjust the Home layout and typography in `assets/css/home.css`; the EN/中文 control is implemented in `assets/js/home-language.js`.
+- The `projects` and `awards` arrays in `_data/home.yml` are reserved for future sections; add their presentation to `_pages/home.md` when ready.
+- Update the shared profile bio in `_includes/profile-sidebar.html`; edit contact details and the avatar path in `_config.yml`.
+- Adjust layout, typography, card borders, and tag appearance in `assets/css/home.css`; general navigation and page transitions are in `assets/css/site.css`.
+- Edit the eight Notes row colors in `_data/note_palette.yml`. Visible rows sample this palette evenly, keeping the first and last colors. Filtering and column changes recalculate the rows.
 - The CV navigation item points directly to `files/cv.pdf`.
 
 The native renderer preserves common Markdown structures and syntax highlighting. Math uses

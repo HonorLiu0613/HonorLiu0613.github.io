@@ -1,6 +1,6 @@
 <article class="note-card" data-note-url="{{ include.note.url | relative_url }}" data-domain="{{ include.note.domain | escape }}" data-tags="{{ include.note.tags | jsonify | escape }}">
-  <div class="note-card__meta"><span class="field-badge" data-tone="{{ include.note.domain | note_tone }}">{{ include.note.domain | default: 'Notes' }}</span><time datetime="{{ include.note.date | date_to_xmlschema }}">{{ include.note.date | date: '%b %d, %Y' }}</time></div>
+  <div class="note-card__meta"><div class="note-card__field"><span class="note-card__label">Field:</span><span class="field-badge">{{ include.note.domain | default: 'Notes' }}</span></div><time datetime="{{ include.note.date | date_to_xmlschema }}">{{ include.note.date | date: '%b %d, %Y' }}</time></div>
   <h3><a href="{{ include.note.url | relative_url }}">{{ include.note.title }}</a></h3>
   <p>{{ include.note.description | default: include.note.excerpt | strip_html | truncate: 150 }}</p>
-  <div class="tag-list">{% for tag in include.note.tags %}<a class="tag" href="{{ '/notes/' | relative_url }}?tag={{ tag | url_encode }}">{{ tag }}</a>{% endfor %}</div>
+  {% if include.note.tags.size > 0 %}<div class="note-card__topics"><span class="note-card__label">Tags:</span><div class="tag-list">{% for tag in include.note.tags %}<a class="tag" href="{{ '/notes/' | relative_url }}?tag={{ tag | url_encode }}">{{ tag }}</a>{% endfor %}</div></div>{% endif %}
 </article>

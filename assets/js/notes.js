@@ -7,7 +7,33 @@
   const domainSelect = document.querySelector('#domain-filter');
   const tagSelect = document.querySelector('#tag-filter');
   const count = document.querySelector('#result-count');
-  const cards = [...document.querySelectorAll('#notes-list .note-card')];
+  const grid = document.querySelector('#notes-list');
+  const cards = [...grid.querySelectorAll('.note-card')];
+  const rowPalette = JSON.parse(grid.dataset.rowPalette || '[]');
+  // Measure visible rows so filtering and responsive columns share the same color order.
+  const updateRowColors = () => {
+    if (!rowPalette.length) return;
+    const rows = [];
+    cards.filter(card => !card.hidden).forEach(card => {
+      const top = card.offsetTop;
+      const previous = rows[rows.length - 1];
+      if (previous && Math.abs(previous.top - top) < 2) previous.cards.push(card);
+      else rows.push({ top, cards: [card] });
+    });
+    rows.forEach((row, index) => {
+      const paletteIndex = rows.length > 1
+        ? Math.round(index * (rowPalette.length - 1) / (rows.length - 1)) : 0;
+      row.cards.forEach(card => card.style.setProperty('--note-row-color', rowPalette[paletteIndex]));
+    });
+  };
+  let colorFrame;
+  const scheduleRowColors = () => {
+    cancelAnimationFrame(colorFrame);
+    colorFrame = requestAnimationFrame(updateRowColors);
+  };
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(scheduleRowColors).observe(grid);
+  } else window.addEventListener('resize', scheduleRowColors, { passive: true });
   const normalize = value => String(value ?? '').normalize('NFKC').toLocaleLowerCase();
   const entries = cards.map(card => ({
     card, url: card.dataset.noteUrl, domain: card.dataset.domain || '',
@@ -43,6 +69,7 @@
     });
     count.textContent = `${matches} ${matches === 1 ? 'note' : 'notes'}${search.value && !fullTextLoaded ? ' · searching titles, summaries, and tags' : ''}`;
     document.querySelector('#empty-state').hidden = matches > 0;
+    scheduleRowColors();
     if (updateUrl) {
       const url = new URL(location.href);
       [['q', search.value], ['field', domainSelect.value], ['tag', tagSelect.value]].forEach(([key, value]) => {
